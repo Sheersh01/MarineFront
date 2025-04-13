@@ -10,10 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@studio-freight/lenis": "^1.0.42",
     "framer-motion": "^12.6.5",
     "gl-matrix": "^3.4.3",
     "gsap": "^3.12.7",
     "lenis": "^1.2.3",
+    "lucide-react": "^0.488.0",
     "motion": "^12.6.5",
     "ogl": "^1.0.11",
     "react": "^19.0.0",
