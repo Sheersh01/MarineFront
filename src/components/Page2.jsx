@@ -49,9 +49,9 @@ const Page2 = () => {
     <div className="h-full bg-[#121A27]">
       <div
         ref={paragraphRef}
-        className="text-center w-full pt-30 pb-10 font-[he']"
+        className="text-center w-full pt-30 pb-10 font-[hel]"
       >
-        <p className="w-[60%] mx-auto text-[2vw] leading-snug pb-20">
+        <p className="lg:w-[60%] md:w-[80%] w-[90%] mx-auto lg:text-[2vw] md:text-[2vw] text-[2.6vw] leading-snug pb-20">
           We come not for one year, we enjoy what we are doing, we are fully
           independent, handling all types of ships and we really want to bring
           to Ukraine — European standards of port call handling and we want our
@@ -61,7 +61,7 @@ const Page2 = () => {
       </div>
 
       <ScrollVelocity
-        texts={["React Bits afap "]}
+        texts={["React Bits afap","React Bits afap","React Bits afap"]}
         velocity={100}
         className="custom-scroll-text bg-[#121A27]"
       />

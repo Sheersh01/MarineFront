@@ -56,6 +56,8 @@ const HeroSection = () => {
     };
   }, [animationComplete]);
 
+  if(window.innerWidth >= 1024) {
+
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
@@ -145,7 +147,7 @@ const HeroSection = () => {
 
     return () => ctx.revert();
   }, []);
-
+  }
   // Visual indicator for animation state - you can remove this if not needed
  // CSS for clip-path hover effect
  const navItemStyles = `
@@ -183,29 +185,29 @@ const HeroSection = () => {
        <style>{navItemStyles}</style>
     <div className="h-full w-full bg-[#121A27] text-white font-[dw] relative overflow-hidden">
       {/* Navbar */}
-      <nav className="flex items-center w-full z-50 bg-[#121A27]">
+      <nav className="flex items-center w-full z-50 bg-[#121A27] ">
           <div
             ref={(el) => (navbarItemsRef.current[0] = el)}
-            className=" border-b-2 border-r-2 border-white w-[50%] py-6 pl-6"
+            className=" border-b-2 border-r-2 border-white w-[50%] md:py-6 py-4 pl-6 lg:text-[1vw] md:text-[1.2vw] text-[1.2vw]"
           >
-            Logo
+            <h1>Logo</h1>
           </div>
           <div
             ref={(el) => (navbarItemsRef.current[1] = el)}
-            className="nav-item border-b-2 border-r-2 border-white w-[20%] py-6 text-center"
+            className="nav-item border-b-2 border-r-2 border-white w-[20%] md:py-6 py-4 text-center lg:text-[1vw] md:text-[1.2vw] text-[1.2vw]"
           >
             <h1>Login to  Portal</h1>
           </div>
           <div
             ref={(el) => (navbarItemsRef.current[2] = el)}
-            className="nav-item border-b-2 border-r-2 border-white w-[20%] py-6 text-center"
+            className="nav-item border-b-2 border-r-2 border-white w-[20%] md:py-6 py-4 text-center lg:text-[1vw] md:text-[1.2vw] text-[1.2vw]"
           >
             <h1>DashBoard Analytics</h1>
           </div>
           <div
             onClick={() => setMenuOpen((prev) => !prev)}
             ref={(el) => (navbarItemsRef.current[3] = el)}
-            className="nav-item cursor-pointer border-b-2 border-white w-[10%] py-6 text-center"
+            className="nav-item cursor-pointer border-b-2 border-white w-[10%] md:py-6 py-4 text-center lg:text-[1vw] md:text-[1.2vw] text-[1.2vw]"
           >
             Menu
           </div>

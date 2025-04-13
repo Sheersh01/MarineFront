@@ -1,15 +1,66 @@
-import React from 'react'
-import AboutUs from './AboutUs'
-const Page5 = () => {
-  return (
-   <div className='bg-[#121A27] pt-20 h-full'>
-           <p className="w-[60%] mx-auto text-[2vw] leading-snug pb-20">
-           Company is fast growing Port Agency In Ukraine, established in 2014 and focused on new standards of performance and providing of unique information. Own offices located in main Ukrainian sea and river ports. Company is a leader in providing of Market analytics research and export/import statistics for clients.
-        </p>
-  <AboutUs />
-       
-      </div>
-  )
-}
+import React, { useEffect, useRef } from "react";
+import gsap from "gsap";
+import SplitType from "split-type";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import AboutUs from "./AboutUs";
 
-export default Page5
+gsap.registerPlugin(ScrollTrigger);
+
+const Page5 = () => {
+  const paragraphRef = useRef(null);
+
+  useEffect(() => {
+    // Initialize SplitType to split the text into words
+    const split = new SplitType(paragraphRef.current, {
+      types: "words",
+    });
+
+    // Set initial scattered positions for all words
+    gsap.set(split.words, {
+      opacity: 0,
+      y: () => gsap.utils.random(-60, 60), // Random vertical offset
+      x: () => gsap.utils.random(-60, 60), // Random horizontal offset
+      rotate: () => gsap.utils.random(-20, 20), // Random rotation
+    });
+
+    // Animate words back to their original positions when scrolled into view
+    gsap.to(split.words, {
+      opacity: 1,
+      x: 0,
+      y: 0,
+      rotate: 0,
+      duration: 1.2,
+      ease: "power3.out",
+      stagger: {
+        each: 0.02, // Slight delay between each word's animation
+      },
+      scrollTrigger: {
+        trigger: paragraphRef.current,
+        start: "top 80%", // Start animation when element is 80% in view
+        toggleActions: "play none none reverse",
+        once: true, // Play only once (optional)
+      },
+    });
+
+    // Cleanup function to revert SplitType when component unmounts
+    return () => {
+      split.revert();
+    };
+  }, []);
+
+  return (
+    <div className="bg-[#121A27] pt-20 h-full text-white">
+      <div
+        ref={paragraphRef}
+        className="text-center w-full pt-30 pb-10 font-[hel]"
+      >
+        <p className=" md:w-[80%] mx-auto lg:text-[2vw] md:text-[2vw] text-[2.6vw] leading-snug pb-20">
+          Company is fast growing Port Agency In Ukraine, established in 2014 and focused on new standards of performance and providing of unique information. Own offices located in main Ukrainian sea and river ports. Company is a leader in providing of Market analytics research and export/import statistics for clients.
+        </p>
+      </div>
+      <AboutUs />
+    </div>
+  );
+};
+
+export default Page5;
