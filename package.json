@@ -10,8 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "framer-motion": "^12.6.5",
+    "gl-matrix": "^3.4.3",
+    "gsap": "^3.12.7",
+    "lenis": "^1.2.3",
+    "motion": "^12.6.5",
+    "ogl": "^1.0.11",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "split-type": "^0.3.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
