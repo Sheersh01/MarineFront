@@ -6,7 +6,7 @@ const Footer = () => {
   
   return (
     <footer className="bg-[#121A27] text-white">
-      <div className="container mx-auto px-4 py-10">
+      <div className="container mx-auto px-4 pt-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           
           {/* Agency Info */}
@@ -89,9 +89,9 @@ const Footer = () => {
         </div>
         
         {/* Copyright */}
-        <div className="border-t border-gray-700 mt-8 pt-6 text-center">
-          <p className="text-gray-400">
-            © {currentYear} Agency Name. All rights reserved.
+        <div className="border-t border-gray-700 mt-8 py-6 bg-[#0c121f] text-center">
+          <p className="text-cyan-400">
+          © 2014–2025. Stark Shipping | Site developed by SOLAR Digital
           </p>
         </div>
       </div>

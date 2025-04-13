@@ -8,7 +8,7 @@ import Page5 from "./components/Page5";
 import Footer from "./components/Footer";
 const App = () => {
   return (
-    <div className="bg-[#121A27] h-screen text-white">
+    <div className="bg-[#121A27] min-h-screen text-white">
       <HeroSection />
       <Page2 />
       <Page3 />
