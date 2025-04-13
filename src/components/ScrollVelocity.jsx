@@ -1,4 +1,4 @@
-import { useRef, useLayoutEffect, useState } from "react";
+import { useRef, useLayoutEffect, useState, useEffect } from "react";
 import {
   motion,
   useScroll,
@@ -18,9 +18,20 @@ function useElementWidth(ref) {
         setWidth(ref.current.offsetWidth);
       }
     }
+    
+    // Initial measurement
     updateWidth();
+    
+    // Add a small delay for accurate initial measurement
+    const initialTimer = setTimeout(updateWidth, 50);
+    
+    // Handle resize events
     window.addEventListener("resize", updateWidth);
-    return () => window.removeEventListener("resize", updateWidth);
+    
+    return () => {
+      window.removeEventListener("resize", updateWidth);
+      clearTimeout(initialTimer);
+    };
   }, [ref]);
 
   return width;
@@ -73,6 +84,14 @@ export const ScrollVelocity = ({
 
     const copyRef = useRef(null);
     const copyWidth = useElementWidth(copyRef);
+    const [animationReady, setAnimationReady] = useState(false);
+
+    // Only start animation after width is measured
+    useEffect(() => {
+      if (copyWidth > 0 && !animationReady) {
+        setAnimationReady(true);
+      }
+    }, [copyWidth]);
 
     function wrap(min, max, v) {
       const range = max - min;
@@ -87,6 +106,9 @@ export const ScrollVelocity = ({
 
     const directionFactor = useRef(1);
     useAnimationFrame((t, delta) => {
+      // Only run animation when width is properly measured
+      if (!animationReady) return;
+      
       let moveBy = directionFactor.current * baseVelocity * (delta / 1000);
 
       if (velocityFactor.get() < 0) {
@@ -114,11 +136,11 @@ export const ScrollVelocity = ({
 
     return (
       <div
-        className={`${parallaxClassName} relative overflow-hidden`}
+        className={`${parallaxClassName || ""} relative overflow-hidden`}
         style={parallaxStyle}
       >
         <motion.div
-          className={`${scrollerClassName} flex whitespace-nowrap text-center font-sans text-4xl font-bold tracking-[-0.02em] drop-shadow md:text-[5rem] md:leading-[5rem]`}
+          className={`${scrollerClassName || ""} flex whitespace-nowrap text-center font-sans text-4xl font-bold tracking-[-0.02em] drop-shadow md:text-[5rem] md:leading-[5rem]`}
           style={{ x, ...scrollerStyle }}
         >
           {spans}

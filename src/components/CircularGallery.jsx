@@ -136,6 +136,7 @@ class Media {
     this.textColor = textColor
     this.borderRadius = borderRadius
     this.font = font
+    this.isReady = false
     this.createShader()
     this.createMesh()
     this.createTitle()
@@ -212,6 +213,7 @@ class Media {
     img.onload = () => {
       texture.image = img
       this.program.uniforms.uImageSizes.value = [img.naturalWidth, img.naturalHeight]
+      this.isReady = true // Mark as ready once image is loaded
     }
   }
   createMesh() {
@@ -297,15 +299,39 @@ class App {
     this.container = container
     this.scroll = { ease: 0.05, current: 0, target: 0, last: 0 }
     this.onCheckDebounce = debounce(this.onCheck, 200)
-    this.createRenderer()
-    this.createCamera()
-    this.createScene()
-    this.onResize()
-    this.createGeometry()
-    this.createMedias(items, bend, textColor, borderRadius, font)
-    this.update()
-    this.addEventListeners()
+    this.isInitialized = false
+    this.allImagesLoaded = false
+    this.loadedImagesCount = 0
+    this.totalImages = 0
+    
+    // Delay the initialization slightly to ensure container is properly rendered
+    setTimeout(() => {
+      this.createRenderer()
+      this.createCamera()
+      this.createScene()
+      this.onResize()
+      this.createGeometry()
+      this.createMedias(items, bend, textColor, borderRadius, font)
+      this.addEventListeners()
+      
+      // Start animation only when at least one image is loaded
+      this.checkImagesLoaded()
+    }, 100)
   }
+  
+  checkImagesLoaded() {
+    // Check if any images are ready to start animation
+    if (this.medias && this.medias.some(media => media.isReady)) {
+      if (!this.isInitialized) {
+        this.isInitialized = true
+        this.update()
+      }
+    } else {
+      // Check again in a moment
+      setTimeout(() => this.checkImagesLoaded(), 100)
+    }
+  }
+  
   createRenderer() {
     this.renderer = new Renderer({ alpha: true })
     this.gl = this.renderer.gl
@@ -343,6 +369,8 @@ class App {
     ]
     const galleryItems = items && items.length ? items : defaultItems
     this.mediasImages = galleryItems.concat(galleryItems)
+    this.totalImages = this.mediasImages.length
+    
     this.medias = this.mediasImages.map((data, index) => {
       return new Media({
         geometry: this.planeGeometry,
@@ -363,26 +391,29 @@ class App {
     })
   }
   onTouchDown(e) {
+    if (!this.isInitialized) return
     this.isDown = true
     this.scroll.position = this.scroll.current
     this.start = e.touches ? e.touches[0].clientX : e.clientX
   }
   onTouchMove(e) {
-    if (!this.isDown) return
+    if (!this.isDown || !this.isInitialized) return
     const x = e.touches ? e.touches[0].clientX : e.clientX
     const distance = (this.start - x) * 0.05
     this.scroll.target = this.scroll.position + distance
   }
   onTouchUp() {
+    if (!this.isInitialized) return
     this.isDown = false
     this.onCheck()
   }
   onWheel() {
+    if (!this.isInitialized) return
     this.scroll.target += 2
     this.onCheckDebounce()
   }
   onCheck() {
-    if (!this.medias || !this.medias[0]) return
+    if (!this.medias || !this.medias[0] || !this.isInitialized) return
     const width = this.medias[0].width
     const itemIndex = Math.round(Math.abs(this.scroll.target) / width)
     const item = width * itemIndex
@@ -390,24 +421,35 @@ class App {
   }
   onResize() {
     this.screen = {
-      width: this.container.clientWidth,
-      height: this.container.clientHeight
+      width: this.container.clientWidth || window.innerWidth,
+      height: this.container.clientHeight || window.innerHeight
     }
+    
+    // Only continue if renderer is created
+    if (!this.renderer) return
+    
     this.renderer.setSize(this.screen.width, this.screen.height)
-    this.camera.perspective({
-      aspect: this.screen.width / this.screen.height
-    })
-    const fov = (this.camera.fov * Math.PI) / 180
-    const height = 2 * Math.tan(fov / 2) * this.camera.position.z
-    const width = height * this.camera.aspect
-    this.viewport = { width, height }
-    if (this.medias) {
-      this.medias.forEach((media) =>
-        media.onResize({ screen: this.screen, viewport: this.viewport })
-      )
+    
+    if (this.camera) {
+      this.camera.perspective({
+        aspect: this.screen.width / this.screen.height
+      })
+      
+      const fov = (this.camera.fov * Math.PI) / 180
+      const height = 2 * Math.tan(fov / 2) * this.camera.position.z
+      const width = height * this.camera.aspect
+      this.viewport = { width, height }
+      
+      if (this.medias) {
+        this.medias.forEach((media) =>
+          media.onResize({ screen: this.screen, viewport: this.viewport })
+        )
+      }
     }
   }
   update() {
+    if (!this.isInitialized) return
+    
     this.scroll.current = lerp(
       this.scroll.current,
       this.scroll.target,
@@ -463,11 +505,21 @@ export default function CircularGallery({
 }) {
   const containerRef = useRef(null)
   useEffect(() => {
-    const app = new App(containerRef.current, { items, bend, textColor, borderRadius, font })
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      if (containerRef.current) {
+        const app = new App(containerRef.current, { items, bend, textColor, borderRadius, font })
+        return () => {
+          app.destroy()
+        }
+      }
+    }, 100)
+    
     return () => {
-      app.destroy()
+      clearTimeout(timer)
     }
   }, [items, bend, textColor, borderRadius, font])
+  
   return (
     <div className='w-full h-full overflow-hidden cursor-grab active:cursor-grabbing' ref={containerRef} />
   )

@@ -61,7 +61,7 @@ const Page2 = () => {
       </div>
 
       <ScrollVelocity
-        texts={["React Bits afap asjfp ", "Scroll Down", "Hello Brother"]}
+        texts={["React Bits afap "]}
         velocity={100}
         className="custom-scroll-text bg-[#121A27]"
       />
