@@ -76,7 +76,7 @@ const HeroSection = () => {
           x: "-50%",
           scale: 0.4,
           opacity: 1,
-          duration: 4.0,
+          duration: 3.0,
           ease: "power4.out",
         },
         "shipEnter"
@@ -116,7 +116,7 @@ const HeroSection = () => {
           duration: 1,
           ease: "power2.out",
         },
-        "textMove+=1" // Start 1 second after fade in completes
+        "textMove+=0.5" // Start 1 second after fade in completes
       );
 
       tl.to(
@@ -126,7 +126,7 @@ const HeroSection = () => {
           duration: 1,
           ease: "power2.out",
         },
-        "textMove+=1" // Same timing as right-moving texts
+        "textMove+=0.5" // Same timing as right-moving texts
       );
 
       // Step 4: Ship rotates after text movement
@@ -139,7 +139,7 @@ const HeroSection = () => {
           duration: 1,
           ease: "power2.out",
         },
-        "textMove+=1" // Small pause after text movement
+        "textMove+=0.5" // Small pause after text movement
       );
     }, containerRef);
 
@@ -194,13 +194,13 @@ const HeroSection = () => {
             ref={(el) => (navbarItemsRef.current[1] = el)}
             className="nav-item border-b-2 border-r-2 border-white w-[20%] py-6 text-center"
           >
-            <h1>Login to Stark Portal</h1>
+            <h1>Login to  Portal</h1>
           </div>
           <div
             ref={(el) => (navbarItemsRef.current[2] = el)}
             className="nav-item border-b-2 border-r-2 border-white w-[20%] py-6 text-center"
           >
-            <h1>Login to Stark Research</h1>
+            <h1>DashBoard Analytics</h1>
           </div>
           <div
             onClick={() => setMenuOpen((prev) => !prev)}

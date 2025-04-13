@@ -32,13 +32,13 @@ const ZoomParallax = () => {
   const scale9 = useTransform(scrollYProgress, [0, 1], [1, 9]);
   
   const pictures = [
-    { src: "src/assets/1.jpeg", scale: scale4 },
-    { src: "src/assets/2.jpeg", scale: scale5 },
+    { src: "src/assets/1.png", scale: scale4 },
+    { src: "src/assets/2.png", scale: scale5 },
+    { src: "src/assets/7.png", scale: scale6 },
+    { src: "src/assets/3.jpg", scale: scale5 },
     { src: "src/assets/3.jpg", scale: scale6 },
-    { src: "src/assets/6.jpg", scale: scale5 },
-    { src: "src/assets/4.jpg", scale: scale6 },
-    { src: "src/assets/5.jpg", scale: scale8 },
-    { src: "src/assets/7.jpeg", scale: scale9 }
+    { src: "src/assets/5.svg", scale: scale8 },
+    { src: "src/assets/6.jpg", scale: scale9 }
   ];
   
   return (
@@ -56,12 +56,12 @@ const ZoomParallax = () => {
                 className="w-full h-full absolute top-0 flex items-center justify-center"
               >
                 <div className={`relative ${
-                  index === 1 ? "top-[-30vh] left-[5vw] w-[35vw] h-[30vh]" :
-                  index === 2 ? "top-[-10vh] left-[-25vw] w-[20vw] h-[45vh]" :
-                  index === 3 ? "left-[27.5vw] w-[25vw] h-[25vh]" :
-                  index === 4 ? "top-[27.5vh] left-[5vw] w-[20vw] h-[25vh]" :
-                  index === 5 ? "top-[27.5vh] left-[-22.5vw] w-[30vw] h-[25vh]" :
-                  index === 6 ? "top-[22.5vh] left-[25vw] w-[15vw] h-[15vh]" :
+                  index === 1 ? "object-contain top-[-30vh] left-[5vw] w-[35vw] h-[30vh]" :
+                  index === 2 ? "object-contain top-[-10vh] left-[-30vw] w-[30vw] h-[45vh]" :
+                  index === 3 ? "object-contain left-[27.5vw] w-[25vw] h-[25vh]" :
+                  index === 4 ? "object-contain top-[27.5vh] left-[5vw] w-[20vw] h-[25vh]" :
+                  index === 5 ? "object-contain top-[27.5vh] left-[-22.5vw] w-[30vw] h-[25vh]" :
+                  index === 6 ? "object-contain top-[22.5vh] left-[25vw] w-[15vw] h-[15vh]" :
                   "w-[25vw] h-[25vh]"
                 }`}>
                   <img 
