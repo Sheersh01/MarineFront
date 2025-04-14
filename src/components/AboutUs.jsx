@@ -130,7 +130,7 @@ const AboutCompany = () => {
             ref={headingRef}
             className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tight"
           >
-            Biggest Independent Ship Agency in Ukraine
+            Biggest Independent Ship Agency in India
           </h1>
 
           <motion.p
@@ -141,7 +141,7 @@ const AboutCompany = () => {
           >
             Fast-growing Port Agency established in 2014, setting new standards
             of performance and providing unique information across all major
-            Ukrainian sea and river ports.
+            Indian sea and river ports.
           </motion.p>
         </div>
 
@@ -571,7 +571,7 @@ const AboutCompany = () => {
               {[
                 {
                   icon: <Briefcase size={20} />,
-                  title: "8 Offices in Ukraine",
+                  title: "8 Offices in India",
                   subtitle: "Strategic presence in all major ports",
                 },
                 {

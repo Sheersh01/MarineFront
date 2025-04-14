@@ -54,9 +54,10 @@ const Page5 = () => {
         ref={paragraphRef}
         className="text-center w-full pt-30 pb-10 font-[hel]"
       >
-        <p className=" md:w-[80%] mx-auto lg:text-[2vw] md:text-[2vw] text-[2.6vw] leading-snug pb-20">
-          Company is fast growing Port Agency In Ukraine, established in 2014 and focused on new standards of performance and providing of unique information. Own offices located in main Ukrainian sea and river ports. Company is a leader in providing of Market analytics research and export/import statistics for clients.
-        </p>
+        <p className="md:w-[80%] mx-auto lg:text-[2vw] md:text-[2vw] text-[2.6vw] leading-snug pb-20">
+  We are a fast-growing ocean intelligence agency based in India, focused on protecting marine ecosystems through data. Using public sources and AI, we deliver unique insights and threat detection to help researchers and policymakers take meaningful action.
+</p>
+
       </div>
       <AboutUs />
     </div>

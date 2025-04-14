@@ -17,25 +17,25 @@ const HeroSection = () => {
 
   const items = [
     {
-      image: "https://picsum.photos/300/300?grayscale",
+      image: "./Menu/ship.png",
       link: "/",
       title: "Home",
       description: "Return to the main page",
     },
     {
-      image: "https://picsum.photos/400/400?grayscale",
+      image: "./Menu/2.jpg",
       link: "/oil-spills",
       title: "Oil Spills",
       description: "Learn about marine oil pollution impacts",
     },
     {
-      image: "https://picsum.photos/500/500?grayscale",
+      image: "./Menu/3.jpg",
       link: "/illegal-fishing",
       title: "Illegal Fishing",
       description: "Discover consequences of unreported fishing",
     },
     {
-      image: "https://picsum.photos/600/600?grayscale",
+      image: "./Menu/6.jpg",
       link: "/ocean-trafficking",
       title: "Ocean Trafficking",
       description: "Maritime routes used for illegal activities",
@@ -199,7 +199,7 @@ const HeroSection = () => {
       <div className="h-full w-full bg-[#121A27] text-white">
         <nav className="flex items-center w-full z-50 bg-[#121A27]">
           <div className="border-b-2 border-r-2 border-white w-[50%] md:py-6 py-4 pl-6 lg:text-[1vw] md:text-[1.2vw] text-[1.2vw]">
-            <h1>Logo</h1>
+            <h1>DeepLens</h1>
           </div>
           <div className="nav-item border-b-2 border-r-2 border-white w-[20%] md:py-6 py-4 text-center lg:text-[1vw] md:text-[1.2vw] text-[1.2vw]">
             <h1>Login to Portal</h1>
@@ -241,7 +241,7 @@ const HeroSection = () => {
             ref={(el) => (navbarItemsRef.current[0] = el)}
             className="border-b-2 border-r-2 border-white w-[50%] md:py-6 py-4 pl-6 lg:text-[1vw] md:text-[1.2vw] text-[1.2vw]"
           >
-            <h1>Logo</h1>
+            <h1>DeepLens</h1>
           </div>
           <div
             ref={(el) => (navbarItemsRef.current[1] = el)}
