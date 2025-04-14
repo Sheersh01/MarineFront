@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-
+import { isWater } from "../utils/geocode.js"; 
 // Fix for Leaflet marker icon issue in React
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -52,7 +52,9 @@ const DashboardAnalysis = ({ onBackToHome = () => console.warn("onBackToHome not
   const [currentAlert, setCurrentAlert] = useState(null);
   const [lastUpdated, setLastUpdated] = useState("Never");
   const [responseText, setResponseText] = useState("No data sent yet.");
-
+  const [checkingLand, setCheckingLand] = useState(false);
+  // Add new state for land/water status
+  const [locationStatus, setLocationStatus] = useState(null);
   const API_URL = "http://localhost:8000";
 
   const dashboardData = {
@@ -157,13 +159,51 @@ const DashboardAnalysis = ({ onBackToHome = () => console.warn("onBackToHome not
       ...prevData,
       [id]: value
     }));
+    // Reset location status when coordinates are changed
+    if (id === 'lat' || id === 'lon') {
+      setLocationStatus(null);
+    }
   };
   
-  // Submit vessel data form
   const handleVesselSubmit = async (e) => {
     e.preventDefault();
-    setResponseText('Sending data...');
-    
+    setCheckingLand(true);
+    setResponseText("Validating location…");
+    setLocationStatus("checking");
+
+    const latNum = parseFloat(vesselData.lat);
+    const lonNum = parseFloat(vesselData.lon);
+
+    let water = true;
+    try {
+      water = await isWater(latNum, lonNum);
+      // Set location status based on water check result
+      setLocationStatus(water ? "water" : "land");
+      
+      if (!water) {
+        setResponseText("⚠️ That point is on land. Analysis skipped.");
+        setCurrentAlert({
+          mmsi: parseInt(vesselData.mmsi),
+          timestamp: new Date(vesselData.timestamp).toISOString(),
+          lat: latNum,
+          lon: lonNum,
+          message: "LOCATION ERROR: The specified coordinates are on land.",
+          is_illegal_fishing: false,
+          is_fishing_probability: 0,
+          alert_needed: true
+        });
+        setCheckingLand(false);
+        return;
+      }
+    } catch (err) {
+      console.warn("Geocode failed, assuming water", err);
+      water = true;
+      setLocationStatus("unknown");
+      setResponseText("⚠️ Location validation failed. Proceeding with analysis assuming water.");
+    }
+
+    // now do your normal POST
+    setResponseText("Sending data...");
     try {
       const formattedData = {
         mmsi: parseInt(vesselData.mmsi),
@@ -172,34 +212,35 @@ const DashboardAnalysis = ({ onBackToHome = () => console.warn("onBackToHome not
         distance_from_port: parseFloat(vesselData.distance_from_port),
         speed: parseFloat(vesselData.speed),
         course: parseFloat(vesselData.course),
-        lat: parseFloat(vesselData.lat),
-        lon: parseFloat(vesselData.lon),
-        source: vesselData.source
+        lat: latNum,
+        lon: lonNum,
+        source: vesselData.source,
       };
-      
-      const response = await fetch('/api/vessel', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formattedData)
-      });
 
+      const response = await fetch("/api/vessel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formattedData),
+      });
       const data = await response.json();
       setResponseText(JSON.stringify(data, null, 2));
-      
-      // Check for alert conditions
+
       if (data.is_fishing_probability > 0.5 || data.is_illegal_fishing) {
         data.alert_needed = true;
-        data.message = data.is_illegal_fishing ? 
-          "ILLEGAL FISHING ALERT: Vessel detected in restricted zone!" : 
-          "HIGH FISHING PROBABILITY ALERT: Vessel likely engaged in fishing activity.";
+        data.message = data.is_illegal_fishing
+          ? "ILLEGAL FISHING ALERT: Vessel detected in restricted zone!"
+          : "HIGH FISHING PROBABILITY ALERT: Vessel likely engaged in fishing activity.";
         setCurrentAlert(data);
       }
-      
+
       updateMap();
     } catch (error) {
-      setResponseText('Error: ' + error.message);
+      setResponseText("Error: " + error.message);
+    } finally {
+      setCheckingLand(false);
     }
   };
+
   
   // Update map
   const updateMap = async () => {
@@ -225,40 +266,104 @@ const DashboardAnalysis = ({ onBackToHome = () => console.warn("onBackToHome not
 
   // Simulate response
   const handleSimulate = () => {
-    const formattedData = {
-      mmsi: parseInt(vesselData.mmsi),
-      timestamp: new Date(vesselData.timestamp).toISOString(),
-      distance_from_shore: parseFloat(vesselData.distance_from_shore),
-      distance_from_port: parseFloat(vesselData.distance_from_port),
-      speed: parseFloat(vesselData.speed),
-      course: parseFloat(vesselData.course),
-      lat: parseFloat(vesselData.lat),
-      lon: parseFloat(vesselData.lon),
-      source: vesselData.source
+    // First check if the location is on land
+    const checkLandWater = async () => {
+      setCheckingLand(true);
+      setLocationStatus("checking");
+      
+      const latNum = parseFloat(vesselData.lat);
+      const lonNum = parseFloat(vesselData.lon);
+      
+      try {
+        const water = await isWater(latNum, lonNum);
+        setLocationStatus(water ? "water" : "land");
+        
+        if (!water) {
+          setResponseText("⚠️ That point is on land. Analysis skipped.");
+          setCurrentAlert({
+            mmsi: parseInt(vesselData.mmsi),
+            timestamp: new Date(vesselData.timestamp).toISOString(),
+            lat: latNum,
+            lon: lonNum,
+            message: "LOCATION ERROR: The specified coordinates are on land.",
+            is_illegal_fishing: false,
+            is_fishing_probability: 0,
+            alert_needed: true
+          });
+          setCheckingLand(false);
+          return;
+        }
+        
+        // Continue with simulation
+        simulateResponse();
+      } catch (err) {
+        console.warn("Geocode failed, assuming water", err);
+        setLocationStatus("unknown");
+        setResponseText("⚠️ Location validation failed. Proceeding with simulation assuming water.");
+        simulateResponse();
+      } finally {
+        setCheckingLand(false);
+      }
     };
     
-    const fishingProb = Math.random();
-    const isIllegal = Math.random() > 0.7;
-    const alertNeeded = fishingProb > 0.5 || isIllegal;
-    
-    const data = {
-      ...formattedData,
-      is_fishing_probability: fishingProb,
-      is_illegal_fishing: isIllegal,
-      alert_needed: alertNeeded,
-      message: alertNeeded ? 
-        (isIllegal ? "ILLEGAL FISHING ALERT: Vessel detected in restricted zone!" : 
-                    "HIGH FISHING PROBABILITY ALERT: Vessel likely engaged in fishing activity.") :
-        "Normal vessel activity detected."
+    const simulateResponse = () => {
+      const formattedData = {
+        mmsi: parseInt(vesselData.mmsi),
+        timestamp: new Date(vesselData.timestamp).toISOString(),
+        distance_from_shore: parseFloat(vesselData.distance_from_shore),
+        distance_from_port: parseFloat(vesselData.distance_from_port),
+        speed: parseFloat(vesselData.speed),
+        course: parseFloat(vesselData.course),
+        lat: parseFloat(vesselData.lat),
+        lon: parseFloat(vesselData.lon),
+        source: vesselData.source
+      };
+      
+      const fishingProb = Math.random();
+      const isIllegal = Math.random() > 0.7;
+      const alertNeeded = fishingProb > 0.5 || isIllegal;
+      
+      const data = {
+        ...formattedData,
+        is_fishing_probability: fishingProb,
+        is_illegal_fishing: isIllegal,
+        alert_needed: alertNeeded,
+        message: alertNeeded ? 
+          (isIllegal ? "ILLEGAL FISHING ALERT: Vessel detected in restricted zone!" : 
+                      "HIGH FISHING PROBABILITY ALERT: Vessel likely engaged in fishing activity.") :
+          "Normal vessel activity detected."
+      };
+      
+      setResponseText(JSON.stringify(data, null, 2));
+      if (data.alert_needed) setCurrentAlert(data);
+      
+      // Update map with simulated vessel
+      updateMap();
     };
     
-    setResponseText(JSON.stringify(data, null, 2));
-    if (data.alert_needed) setCurrentAlert(data);
+    // Start the process
+    checkLandWater();
   };
   
   // Clear current alert
   const clearAlert = () => {
     setCurrentAlert(null);
+  };
+
+  // Function to render location status indicator
+  const renderLocationStatus = () => {
+    switch (locationStatus) {
+      case "checking":
+        return <span className="py-1 px-2 bg-yellow-600 text-white text-xs rounded">Checking location...</span>;
+      case "water":
+        return <span className="py-1 px-2 bg-blue-600 text-white text-xs rounded">✓ Water confirmed</span>;
+      case "land":
+        return <span className="py-1 px-2 bg-red-600 text-white text-xs rounded">⚠️ Land detected</span>;
+      case "unknown":
+        return <span className="py-1 px-2 bg-gray-600 text-white text-xs rounded">? Location status unknown</span>;
+      default:
+        return null;
+    }
   };
 
   return (
@@ -458,7 +563,9 @@ const DashboardAnalysis = ({ onBackToHome = () => console.warn("onBackToHome not
                   </div>
                   
                   <div className="mb-3">
-                    <label htmlFor="lat" className="block text-sm font-medium mb-1">Latitude:</label>
+                    <label htmlFor="lat" className="block text-sm font-medium mb-1">
+                      Latitude: {renderLocationStatus()}
+                    </label>
                     <input 
                       type="number" 
                       id="lat" 
@@ -502,11 +609,12 @@ const DashboardAnalysis = ({ onBackToHome = () => console.warn("onBackToHome not
                     </select>
                   </div>
                   
-                  <button 
+                  <button
                     type="submit"
+                    disabled={checkingLand}
                     className="w-full p-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium"
                   >
-                    Submit Vessel Data
+                    {checkingLand ? "Validating…" : "Submit Vessel Data"}
                   </button>
                   
                   <div className="flex gap-2 mt-4">
@@ -545,44 +653,52 @@ const DashboardAnalysis = ({ onBackToHome = () => console.warn("onBackToHome not
                 <div className="mt-4">
                   <h3 className="text-lg font-medium mb-2">Vessel Map</h3>
                   <div className="bg-[#1A2535] p-3 rounded">
-                  <div style={{ height: "300px", width: "100%" }}>
-                  <MapContainer 
-  center={[parseFloat(vesselData.lat), parseFloat(vesselData.lon)]} 
-  zoom={5} 
-  style={{ height: "100%", width: "100%" }}
-  ref={mapRef}
->
-  <TileLayer
-    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-  />
-  <Marker position={[parseFloat(vesselData.lat), parseFloat(vesselData.lon)]}>
-    <Popup>
-      MMSI: {vesselData.mmsi}<br />
-      Speed: {vesselData.speed} knots<br />
-      Course: {vesselData.course}°
-    </Popup>
-  </Marker>
-  {vessels.map((vessel, index) => (
-    <Marker 
-      key={`${vessel.mmsi}-${index}`} 
-      position={[parseFloat(vessel.lat), parseFloat(vessel.lon)]}
-    >
-      <Popup>
-        MMSI: {vessel.mmsi}<br />
-        Speed: {vessel.speed} knots<br />
-        Course: {vessel.course}°
-      </Popup>
-    </Marker>
-  ))}
-  
-  {/* Add this line */}
-  <MapCenterHandler lat={parseFloat(vesselData.lat)} lng={parseFloat(vesselData.lon)} />
-</MapContainer>
-</div>
-                    <p className="text-sm text-gray-400 mt-2">
-                      Last updated: <span>{lastUpdated}</span>
-                    </p>
+                    <div style={{ height: "300px", width: "100%" }}>
+                      <MapContainer 
+                        center={[parseFloat(vesselData.lat), parseFloat(vesselData.lon)]} 
+                        zoom={5} 
+                        style={{ height: "100%", width: "100%" }}
+                        ref={mapRef}
+                      >
+                        <TileLayer
+                          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        />
+                        <Marker position={[parseFloat(vesselData.lat), parseFloat(vesselData.lon)]}>
+                          <Popup>
+                            MMSI: {vesselData.mmsi}<br />
+                            Speed: {vesselData.speed} knots<br />
+                            Course: {vesselData.course}°
+                            {locationStatus === "land" && <div className="font-bold text-red-500">⚠️ LAND LOCATION</div>}
+                          </Popup>
+                        </Marker>
+                        {vessels.map((vessel, index) => (
+                          <Marker 
+                            key={`${vessel.mmsi}-${index}`} 
+                            position={[parseFloat(vessel.lat), parseFloat(vessel.lon)]}
+                          >
+                            <Popup>
+                              MMSI: {vessel.mmsi}<br />
+                              Speed: {vessel.speed} knots<br />
+                              Course: {vessel.course}°
+                            </Popup>
+                          </Marker>
+                        ))}
+                        
+                        {/* Add this line */}
+                        <MapCenterHandler lat={parseFloat(vesselData.lat)} lng={parseFloat(vesselData.lon)} />
+                      </MapContainer>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <p className="text-sm text-gray-400 mt-2">
+                        Last updated: <span>{lastUpdated}</span>
+                      </p>
+                      {locationStatus === "land" && (
+                        <div className="mt-2 bg-red-800 text-white px-3 py-1 rounded-md text-sm">
+                          ⚠️ Current location is on land! Maritime analysis unavailable.
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -596,23 +712,30 @@ const DashboardAnalysis = ({ onBackToHome = () => console.warn("onBackToHome not
                 <p className="text-gray-400">No current alert.</p>
               ) : (
                 <div className={`border-l-4 p-3 rounded bg-[#1A2535] ${
+                  locationStatus === "land" ? "border-red-600" :
                   currentAlert.is_illegal_fishing ? "border-red-600" : 
                   currentAlert.is_fishing_probability > 0.7 ? "border-yellow-600" : "border-blue-600"
                 }`}>
-                  <h4 className="text-md font-semibold">Alert</h4>
+                  <h4 className="text-md font-semibold">
+                    {locationStatus === "land" ? "Location Error" : "Alert"}
+                  </h4>
                   <p className="text-sm"><strong>MMSI:</strong> {currentAlert.mmsi}</p>
                   <p className="text-sm"><strong>Time:</strong> {new Date(currentAlert.timestamp).toLocaleString()}</p>
                   <p className="text-sm">
                     <strong>Location:</strong> {parseFloat(currentAlert.lat).toFixed(4)}, {parseFloat(currentAlert.lon).toFixed(4)}
+                    {locationStatus === "land" && (
+                      <span className="ml-2 text-red-400 font-bold">ON LAND</span>
+                    )}
                   </p>
-                  <p className="text-sm"><strong>Fishing Probability:</strong> {(currentAlert.is_fishing_probability * 100).toFixed(1)}%</p>
+                  {locationStatus !== "land" && (
+                    <p className="text-sm"><strong>Fishing Probability:</strong> {(currentAlert.is_fishing_probability * 100).toFixed(1)}%</p>
+                  )}
                   <p className="text-sm"><strong>Message:</strong> {currentAlert.message}</p>
                 </div>
               )}
             </div>
           </div>
         )}
-
         {/* Ocean Trafficking Section placeholder */}
         {activeTab === "ocean-trafficking" && (
           <div className="mb-6">
