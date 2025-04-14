@@ -92,12 +92,7 @@ export default function IllegalFishingAwareness() {
     <p className="text-xl mb-8">
       Exploring the causes, consequences, and solutions to unsustainable fishing practices threatening our oceans.
     </p>
-    <button
-      onClick={() => scrollToSection('map')}
-      className="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-8 rounded-md transition-all transform hover:-translate-y-1"
-    >
-      Learn More
-    </button>
+   
   </div>
 </section>
 

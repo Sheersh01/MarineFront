@@ -83,12 +83,7 @@ export default function OilSpillAwarenessPage() {
         <div className="container mx-auto px-4 z-20 max-w-3xl fade-element visible">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Unseen Catastrophes: The Impact of Oil Spills on Our Oceans</h1>
           <p className="text-xl mb-8">Exploring the causes, consequences, and solutions to marine oil pollution.</p>
-          <button 
-            onClick={() => scrollToSection('map')} 
-            className="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-8 rounded-md transition-all transform hover:-translate-y-1"
-          >
-            Learn More
-          </button>
+           
         </div>
       </section>
 
