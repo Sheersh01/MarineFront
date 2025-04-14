@@ -157,8 +157,9 @@ const HeroSection = () => {
     navigate('/dashboard-analysis');
   };
   // Handle back to home
+  // Navigation function to go back to home
   const handleBackToHome = () => {
-    navigate('/');
+    navigate("/"); // Navigate to home route
   };
 
   // CSS for clip-path hover effect
@@ -251,7 +252,7 @@ const HeroSection = () => {
           </div>
           <div
             ref={(el) => (navbarItemsRef.current[2] = el)}
-            onClick={handleDashboardClick}
+            onClick={handleDashboardClick} 
             className="nav-item border-b-2 border-r-2 border-white w-[20%] md:py-6 py-4 text-center lg:text-[1vw] md:text-[1.2vw] text-[1.2vw] cursor-pointer"
           >
             <h1>Dashboard Analytics</h1>
