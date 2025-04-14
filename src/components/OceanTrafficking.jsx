@@ -93,7 +93,7 @@ export default function OceanTraffickingAwarenessPage() {
 </section>
 
 {/* Interactive Map Section */}
-<section id="map" className="py-20 bg-primary text-white">
+{/* <section id="map" className="py-20 bg-primary text-white">
   <div className="container mx-auto px-4">
     <div className="max-w-4xl mx-auto mb-12 text-center fade-element visible">
       <h2 className="text-3xl md:text-4xl font-bold mb-6">Major Human Trafficking Routes Worldwide</h2>
@@ -149,7 +149,7 @@ export default function OceanTraffickingAwarenessPage() {
       </div>
     </div>
   </div>
-</section>
+</section> */}
 
       {/* Human Impact Section */}
 <section id="victims" className="py-20 bg-blue-50">
@@ -161,7 +161,7 @@ export default function OceanTraffickingAwarenessPage() {
     
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
       <SpeciesCard 
-        image="/api/placeholder/400/300"
+        image="https://plus.unsplash.com/premium_photo-1683134519713-62a3ff300b34?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         title="Migrant Workers"
         status="Vulnerable"
         statusColor="bg-orange-500"
@@ -170,7 +170,7 @@ export default function OceanTraffickingAwarenessPage() {
       </SpeciesCard>
       
       <SpeciesCard 
-        image="/api/placeholder/400/300"
+        image="https://plus.unsplash.com/premium_photo-1681841986668-117d7eaab200?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         title="Refugees"
         status="Highly Vulnerable"
         statusColor="bg-red-500"
@@ -179,7 +179,7 @@ export default function OceanTraffickingAwarenessPage() {
       </SpeciesCard>
       
       <SpeciesCard 
-        image="/api/placeholder/400/300"
+        image="https://images.unsplash.com/photo-1483193722442-5422d99849bc?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         title="Children"
         status="Critical Risk"
         statusColor="bg-red-500"
@@ -188,7 +188,7 @@ export default function OceanTraffickingAwarenessPage() {
       </SpeciesCard>
       
       <SpeciesCard 
-        image="/api/placeholder/400/300"
+        image="https://images.unsplash.com/photo-1611673982501-93cabee16c77?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         title="Women"
         status="High Risk"
         statusColor="bg-red-500"
@@ -268,7 +268,7 @@ export default function OceanTraffickingAwarenessPage() {
 </section>
 
 {/* Technologies Section */}
-<section id="tech" className="py-20 bg-blue-50">
+{/* <section id="tech" className="py-20 bg-blue-50">
   <div className="container mx-auto px-4">
     <div className="max-w-4xl mx-auto mb-12 text-center fade-element visible">
       <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900">Digital Guardians: Monitoring Maritime Trafficking</h2>
@@ -308,10 +308,10 @@ export default function OceanTraffickingAwarenessPage() {
       </div>
     </div>
   </div>
-</section>
+</section> */}
 
     {/* Case Studies Section */}
-<section id="cases" className="py-20 bg-primary text-white">
+{/* <section id="cases" className="py-20 bg-primary text-white">
   <div className="container mx-auto px-4">
     <div className="max-w-4xl mx-auto mb-12 text-center fade-element visible">
       <h2 className="text-3xl md:text-4xl font-bold mb-6">Notable Trafficking Cases</h2>
@@ -374,7 +374,7 @@ export default function OceanTraffickingAwarenessPage() {
       </CaseStudy>
     </div>
   </div>
-</section>
+</section> */}
 
 {/* Prevention Section */}
 <section id="prevention" className="py-20 bg-blue-50">
@@ -431,7 +431,7 @@ export default function OceanTraffickingAwarenessPage() {
 </section>
 
 {/* Get Involved Section */}
-<section id="involved" className="py-20 bg-blue-700 text-white">
+{/* <section id="involved" className="py-20 bg-blue-700 text-white">
   <div className="container mx-auto px-4">
     <div className="max-w-4xl mx-auto mb-12 text-center fade-element visible">
       <h2 className="text-3xl md:text-4xl font-bold mb-6">Join the Fight Against Human Trafficking</h2>
@@ -472,7 +472,7 @@ export default function OceanTraffickingAwarenessPage() {
       </div>
     </div>
   </div>
-</section>
+</section> */}
      {/* Footer */}
 <footer className="bg-gray-900 text-white py-16">
   <div className="container mx-auto px-4">

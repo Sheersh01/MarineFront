@@ -92,7 +92,7 @@ export default function OilSpillAwarenessPage() {
         </div>
       </section>
 
-      {/* Interactive Map Section */}
+      {/* Interactive Map Section
       <section id="map" className="py-20 bg-primary text-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto mb-12 text-center fade-element visible">
@@ -149,7 +149,7 @@ export default function OilSpillAwarenessPage() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Marine Life Section */}
       <section id="marine" className="py-20 bg-blue-50">
@@ -161,7 +161,7 @@ export default function OilSpillAwarenessPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <SpeciesCard 
-              image="/api/placeholder/400/300"
+              image="https://images.unsplash.com/photo-1437622368342-7a3d73a34c8f?q=80&w=1920&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               title="Sea Turtles"
               status="Endangered"
               statusColor="bg-red-500"
@@ -170,7 +170,7 @@ export default function OilSpillAwarenessPage() {
             </SpeciesCard>
             
             <SpeciesCard 
-              image="/api/placeholder/400/300"
+              image="https://plus.unsplash.com/premium_photo-1664303478026-d4030f79eda4?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               title="Dolphins"
               status="Vulnerable"
               statusColor="bg-orange-500"
@@ -179,7 +179,7 @@ export default function OilSpillAwarenessPage() {
             </SpeciesCard>
             
             <SpeciesCard 
-              image="/api/placeholder/400/300"
+              image="https://images.unsplash.com/photo-1621822602079-26c868d43ba2?q=80&w=2013&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               title="Seabirds"
               status="Threatened"
               statusColor="bg-yellow-500"
@@ -188,7 +188,7 @@ export default function OilSpillAwarenessPage() {
             </SpeciesCard>
             
             <SpeciesCard 
-              image="/api/placeholder/400/300"
+              image="https://plus.unsplash.com/premium_photo-1661841439995-1706237c83dc?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               title="Coral Reefs"
               status="Endangered"
               statusColor="bg-red-500"
@@ -267,7 +267,7 @@ export default function OilSpillAwarenessPage() {
         </div>
       </section>
 
-      {/* Technologies Section */}
+      {/* Technologies Section
       <section id="tech" className="py-20 bg-blue-50">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto mb-12 text-center fade-element visible">
@@ -308,9 +308,9 @@ export default function OilSpillAwarenessPage() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
-      {/* Case Studies Section */}
+      {/* Case Studies Section
       <section id="cases" className="py-20 bg-primary text-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto mb-12 text-center fade-element visible">
@@ -374,7 +374,7 @@ export default function OilSpillAwarenessPage() {
             </CaseStudy>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Prevention Section */}
       <section id="prevention" className="py-20 bg-blue-50">
@@ -430,7 +430,7 @@ export default function OilSpillAwarenessPage() {
         </div>
       </section>
 
-      {/* Get Involved Section */}
+      {/* Get Involved Section
       <section id="involved" className="py-20 bg-blue-700 text-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto mb-12 text-center fade-element visible">
@@ -472,7 +472,7 @@ export default function OilSpillAwarenessPage() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-16">

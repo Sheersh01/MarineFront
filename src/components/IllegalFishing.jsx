@@ -103,7 +103,7 @@ export default function IllegalFishingAwareness() {
 
 
 {/* Interactive Map Section */}
-<section id="map" className="py-20 bg-primary text-white">
+{/* <section id="map" className="py-20 bg-primary text-white">
   <div className="container mx-auto px-4">
     <div className="max-w-4xl mx-auto mb-12 text-center fade-element visible">
       <h2 className="text-3xl md:text-4xl font-bold mb-6">Global Illegal Fishing & Overfishing Hotspots</h2>
@@ -159,7 +159,7 @@ export default function IllegalFishingAwareness() {
       </div>
     </div>
   </div>
-</section>
+</section> */}
 
      {/* Marine Life Section */}
 <section id="marine" className="py-20 bg-blue-50">
@@ -171,7 +171,7 @@ export default function IllegalFishingAwareness() {
     
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
       <SpeciesCard 
-        image="/api/placeholder/400/300"
+        image="https://plus.unsplash.com/premium_photo-1708433273440-da1b1601212f?q=80&w=2074&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         title="Bluefin Tuna"
         status="Critically Endangered"
         statusColor="bg-red-600"
@@ -180,7 +180,7 @@ export default function IllegalFishingAwareness() {
       </SpeciesCard>
       
       <SpeciesCard 
-        image="/api/placeholder/400/300"
+        image="https://images.unsplash.com/photo-1694217076602-d2a58326f590?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         title="Sharks"
         status="Vulnerable"
         statusColor="bg-orange-500"
@@ -189,7 +189,7 @@ export default function IllegalFishingAwareness() {
       </SpeciesCard>
       
       <SpeciesCard 
-        image="/api/placeholder/400/300"
+        image="https://images.unsplash.com/photo-1437622368342-7a3d73a34c8f?q=80&w=1920&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         title="Sea Turtles"
         status="Endangered"
         statusColor="bg-red-500"
@@ -198,7 +198,7 @@ export default function IllegalFishingAwareness() {
       </SpeciesCard>
       
       <SpeciesCard 
-        image="/api/placeholder/400/300"
+        image="https://plus.unsplash.com/premium_photo-1661841439995-1706237c83dc?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         title="Coral Reefs"
         status="Threatened"
         statusColor="bg-yellow-500"
@@ -277,7 +277,7 @@ export default function IllegalFishingAwareness() {
   </div>
 </section>
 
-{/* Technologies Section */}
+{/* Technologies Section
 <section id="tech" className="py-20 bg-blue-50">
   <div className="container mx-auto px-4">
     <div className="max-w-4xl mx-auto mb-12 text-center fade-element visible">
@@ -318,10 +318,10 @@ export default function IllegalFishingAwareness() {
       </div>
     </div>
   </div>
-</section>
+</section> */}
 
       {/* Case Studies Section */}
-      <section id="cases" className="py-20 bg-primary text-white">
+      {/* <section id="cases" className="py-20 bg-primary text-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto mb-12 text-center fade-element visible">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">Lessons from the Past</h2>
@@ -384,73 +384,8 @@ export default function IllegalFishingAwareness() {
             </CaseStudy>
           </div>
         </div>
-      </section>
-      
-{/* Case Studies Section */}
-<section id="cases" className="py-20 bg-primary text-white">
-  <div className="container mx-auto px-4">
-    <div className="max-w-4xl mx-auto mb-12 text-center fade-element visible">
-      <h2 className="text-3xl md:text-4xl font-bold mb-6">Lessons from the Past</h2>
-      <p className="text-lg">Examining major overfishing and illegal fishing incidents provides valuable insights into policy reform, enforcement, and marine conservation strategies.</p>
-    </div>
+      </section> */}
     
-    <div className="space-y-12">
-      <CaseStudy 
-        title="West African Waters"
-        location="Gulf of Guinea"
-        date="2012–Present"
-        image1="/api/placeholder/400/300"
-        image2="/api/placeholder/400/300"
-        alt1="Illegal Fishing Trawlers"
-        alt2="Local Fishermen Impacted"
-      >
-        <p className="mb-6">Illegal, unreported, and unregulated (IUU) fishing in the Gulf of Guinea has severely depleted fish stocks, threatening food security and local livelihoods. Many foreign vessels fish without licenses, avoiding detection by turning off AIS systems.</p>
-        
-        <div className="border-l-2 border-red-500 pl-6 space-y-4">
-          <TimelineItem date="2012–2015">
-            Surge in foreign trawlers operating without permits or quotas.
-          </TimelineItem>
-          <TimelineItem date="2016">
-            Regional cooperation increases patrols and enforcement activities.
-          </TimelineItem>
-          <TimelineItem date="2019">
-            Satellite monitoring reveals hundreds of illegal vessels in protected zones.
-          </TimelineItem>
-          <TimelineItem date="2023">
-            New EU regulations block seafood imports tied to illegal fishing.
-          </TimelineItem>
-        </div>
-      </CaseStudy>
-      
-      <CaseStudy 
-        title="South China Sea Tensions"
-        location="Southeast Asia"
-        date="2015–Present"
-        image1="/api/placeholder/400/300"
-        image2="/api/placeholder/400/300"
-        alt1="Fishing Boat Detained"
-        alt2="Damaged Coral Reefs"
-      >
-        <p className="mb-6">Massive overfishing and territorial disputes in the South China Sea have led to the collapse of fish populations and destruction of marine habitats. Many vessels engage in illegal bottom trawling and reef destruction despite international warnings.</p>
-        
-        <div className="border-l-2 border-red-500 pl-6 space-y-4">
-          <TimelineItem date="2015">
-            Philippines and Vietnam report aggressive incursions by unlicensed fleets.
-          </TimelineItem>
-          <TimelineItem date="2017">
-            Satellite data confirms destruction of coral reefs due to illegal dredging.
-          </TimelineItem>
-          <TimelineItem date="2020">
-            ASEAN leaders call for cooperative marine resource management.
-          </TimelineItem>
-          <TimelineItem date="2024">
-            Joint patrols and drone surveillance reduce illegal activities by 30%.
-          </TimelineItem>
-        </div>
-      </CaseStudy>
-    </div>
-  </div>
-</section>
 
 {/* Prevention Section */}
 <section id="prevention" className="py-20 bg-blue-50">
@@ -506,7 +441,7 @@ export default function IllegalFishingAwareness() {
   </div>
 </section>
 
-{/* Get Involved Section */}
+{/* Get Involved Section
 <section id="involved" className="py-20 bg-blue-700 text-white">
   <div className="container mx-auto px-4">
     <div className="max-w-4xl mx-auto mb-12 text-center fade-element visible">
@@ -548,7 +483,7 @@ export default function IllegalFishingAwareness() {
       </div>
     </div>
   </div>
-</section>
+</section> */}
 
  {/* Footer */}
 <footer className="bg-gray-900 text-white py-16">
