@@ -3,7 +3,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import InfiniteMenu from "./InfiniteMenu"; // ✅ make sure path is correct
 import DashboardAnalysis from "./DashboardAnalysis"; // Import the separate DashboardAnalysis component
-
+import { useNavigate } from 'react-router-dom';
 gsap.registerPlugin(ScrollTrigger);
 
 const HeroSection = () => {
@@ -151,14 +151,14 @@ const HeroSection = () => {
     }
   }, [showDashboard]);
 
-  // Handle dashboard click
-  const handleDashboardClick = () => {
-    setShowDashboard(true);
-  };
+  const navigate = useNavigate();
 
+  const handleDashboardClick = () => {
+    navigate('/dashboard-analysis');
+  };
   // Handle back to home
   const handleBackToHome = () => {
-    setShowDashboard(false);
+    navigate('/');
   };
 
   // CSS for clip-path hover effect

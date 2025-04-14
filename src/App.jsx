@@ -4,6 +4,7 @@ import OilSpills from './components/OilSpills'
 import IllegalFishing from './components/IllegalFishing'
 import OceanTrafficking from './components/OceanTrafficking'
 import Home from './components/Home'
+import DashboardAnalysis from './components/DashboardAnalysis'
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/oil-spills" element={<OilSpills />} />
         <Route path="/illegal-fishing" element={<IllegalFishing />} />
         <Route path="/ocean-trafficking" element={<OceanTrafficking />} />
+        <Route path="/dashboard-analysis" element={<DashboardAnalysis />} />
       </Routes>
     </Router>
   )
