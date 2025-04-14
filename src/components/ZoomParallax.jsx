@@ -64,7 +64,7 @@ const ZoomParallax = () => {
                   index === 6 ? "object-contain top-[22.5vh] left-[25vw] w-[15vw] h-[15vh]" :
                   "w-[25vw] h-[25vh]"
                 }`}>
-                  <img 
+                  <img loading="lazy" 
                     src={src} 
                     alt={`parallax image ${index + 1}`} 
                     className="w-full h-full object-cover"

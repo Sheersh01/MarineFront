@@ -269,6 +269,7 @@ const HeroSection = () => {
         <div ref={containerRef} className="relative h-screen">
           {/* Image */}
           <img
+           loading="lazy" 
             ref={shipRef}
             className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-50 scale-[0.4] h-full w-full object-contain"
             src="./ship.png"

@@ -208,6 +208,7 @@ class Media {
       transparent: true
     })
     const img = new Image()
+    
     img.crossOrigin = "anonymous"
     img.src = this.image
     img.onload = () => {
