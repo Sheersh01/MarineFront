@@ -16,27 +16,27 @@ const HeroSection = () => {
   const items = [
     {
       image: "https://picsum.photos/300/300?grayscale",
-      link: "https://google.com/",
-      title: "Item 1",
-      description: "This is pretty cool, right?",
+      link: "/",
+      title: "Home",
+      description: "Return to the main page",
     },
     {
       image: "https://picsum.photos/400/400?grayscale",
-      link: "https://google.com/",
-      title: "Item 2",
-      description: "This is pretty cool, right?",
+      link: "/oil-spills",
+      title: "Oil Spills",
+      description: "Learn about marine oil pollution impacts",
     },
     {
       image: "https://picsum.photos/500/500?grayscale",
-      link: "https://google.com/",
-      title: "Item 3",
-      description: "This is pretty cool, right?",
+      link: "/illegal-fishing",
+      title: "Illegal Fishing",
+      description: "Discover consequences of unreported fishing",
     },
     {
       image: "https://picsum.photos/600/600?grayscale",
-      link: "https://google.com/",
-      title: "Item 4",
-      description: "This is pretty cool, right?",
+      link: "/ocean-trafficking",
+      title: "Ocean Trafficking",
+      description: "Maritime routes used for illegal activities",
     },
   ];
 

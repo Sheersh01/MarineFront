@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { mat4, quat, vec2, vec3 } from 'gl-matrix';
+import { useNavigate } from 'react-router-dom';
+import OilSpills from './OilSpills';
+import IllegalFishing from './IllegalFishing';
+import OceanTrafficking from './OceanTrafficking';
 
 const discVertShaderSource = `#version 300 es
 
@@ -864,15 +868,23 @@ const defaultItems = [
   {
     image: 'https://picsum.photos/900/900?grayscale',
     link: 'https://google.com/',
-    title: '',
+    title: 'OilSplils',
     description: ''
   },
 ];
+
+const componentMap = {
+  '/oil-spills': <OilSpills />,
+  '/illegal-fishing': <IllegalFishing />,
+  '/ocean-trafficking': <OceanTrafficking />,
+};
+
 
 export default function InfiniteMenu({ items = [] }) {
   const canvasRef = useRef(null);
   const [activeItem, setActiveItem] = useState(null);
   const [isMoving, setIsMoving] = useState(false);
+  const navigate = useNavigate(); // React Router hook
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -909,11 +921,7 @@ export default function InfiniteMenu({ items = [] }) {
 
   const handleButtonClick = () => {
     if (!activeItem?.link) return;
-    if (activeItem.link.startsWith('http')) {
-      window.open(activeItem.link, '_blank');
-    } else {
-      console.log('Internal route:', activeItem.link);
-    }
+    navigate(activeItem.link); // Navigate to route
   };
 
   return (
@@ -926,72 +934,69 @@ export default function InfiniteMenu({ items = [] }) {
 
       {activeItem && (
         <>
-          {/* Title */}
           <h2
             className={`
-          select-none
-          absolute
-          font-black
-          [font-size:4rem]
-          left-[1.6em]
-          top-1/2
-          transform
-          translate-x-[20%]
-          -translate-y-1/2
-          transition-all
-          ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
-          ${isMoving
+              select-none
+              absolute
+              font-black
+              [font-size:4rem]
+              left-[1.6em]
+              top-1/2
+              transform
+              translate-x-[20%]
+              -translate-y-1/2
+              transition-all
+              ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
+              ${isMoving
                 ? 'opacity-0 pointer-events-none duration-[100ms]'
                 : 'opacity-100 pointer-events-auto duration-[500ms]'
               }
-        `}
+          `}
           >
             {activeItem.title}
           </h2>
 
-          {/* Description */}
           <p
             className={`
-          select-none
-          absolute
-          max-w-[10ch]
-          text-[1.5rem]
-          top-1/2
-          right-[1%]
-          transition-all
-          ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
-          ${isMoving
+              select-none
+              absolute
+              max-w-[10ch]
+              text-[1.5rem]
+              top-1/2
+              right-[1%]
+              transition-all
+              ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
+              ${isMoving
                 ? 'opacity-0 pointer-events-none duration-[100ms] translate-x-[-60%] -translate-y-1/2'
                 : 'opacity-100 pointer-events-auto duration-[500ms] translate-x-[-90%] -translate-y-1/2'
               }
-        `}
+          `}
           >
             {activeItem.description}
           </p>
 
-          {/* Action Button */}
           <div
             onClick={handleButtonClick}
             className={`
-          absolute
-          left-1/2
-          z-10
-          w-[60px]
-          h-[60px]
-          grid
-          place-items-center
-          bg-[#00ffff]
-          border-[5px]
-          border-black
-          rounded-full
-          cursor-pointer
-          transition-all
-          ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
-          ${isMoving
+              absolute
+              left-1/2
+              z-10
+              w-[60px]
+              h-[60px]
+              grid
+              place-items-center
+              bg-[#00ffff]
+              border-[5px]
+              border-black
+              rounded-full
+              cursor-pointer
+              transition-all
+              ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
+              ${isMoving
                 ? 'bottom-[-80px] opacity-0 pointer-events-none duration-[100ms] scale-0 -translate-x-1/2'
                 : 'bottom-[3.8em] opacity-100 pointer-events-auto duration-[500ms] scale-100 -translate-x-1/2'
               }
-        `}
+          `}
           >
             <p className="select-none relative text-[#060606] top-[2px] text-[26px]">
               &#x2197;

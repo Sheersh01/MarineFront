@@ -14,12 +14,15 @@
     "framer-motion": "^12.6.5",
     "gl-matrix": "^3.4.3",
     "gsap": "^3.12.7",
+    "leaflet": "^1.9.4",
     "lenis": "^1.2.3",
     "lucide-react": "^0.488.0",
     "motion": "^12.6.5",
     "ogl": "^1.0.11",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-leaflet": "^5.0.0",
+    "react-router-dom": "^7.5.0",
     "split-type": "^0.3.4"
   },
   "devDependencies": {

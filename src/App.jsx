@@ -1,22 +1,21 @@
-import React from "react";
-import "./App.css";
-import HeroSection from "./components/HeroSection";
-import Page2 from "./components/Page2";
-import Page3 from "./components/Page3";
-import Page4 from "./components/Page4";
-import Page5 from "./components/Page5";
-import Footer from "./components/Footer";
-const App = () => {
-  return (
-    <div className="bg-[#121A27] min-h-screen text-white">
-      <HeroSection />
-      <Page2 />
-      <Page3 />
-      <Page4 /> 
-      <Page5 />
-    <Footer />
-    </div>
-  );
-};
+// App.jsx
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import OilSpills from './components/OilSpills'
+import IllegalFishing from './components/IllegalFishing'
+import OceanTrafficking from './components/OceanTrafficking'
+import Home from './components/Home'
 
-export default App;
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/oil-spills" element={<OilSpills />} />
+        <Route path="/illegal-fishing" element={<IllegalFishing />} />
+        <Route path="/ocean-trafficking" element={<OceanTrafficking />} />
+      </Routes>
+    </Router>
+  )
+}
+
+export default App
