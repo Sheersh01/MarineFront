@@ -5,12 +5,14 @@ import IllegalFishing from './components/IllegalFishing'
 import OceanTrafficking from './components/OceanTrafficking'
 import Home from './components/Home'
 import DashboardAnalysis from './components/DashboardAnalysis'
+import LoginPage from './components/Login'; 
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/oil-spills" element={<OilSpills />} />
         <Route path="/illegal-fishing" element={<IllegalFishing />} />
         <Route path="/ocean-trafficking" element={<OceanTrafficking />} />

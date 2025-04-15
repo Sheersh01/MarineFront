@@ -1,8 +1,8 @@
 import React, { useRef, useLayoutEffect, useState, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import InfiniteMenu from "./InfiniteMenu"; // ✅ make sure path is correct
-import DashboardAnalysis from "./DashboardAnalysis"; // Import the separate DashboardAnalysis component
+import InfiniteMenu from "./InfiniteMenu";
+import DashboardAnalysis from "./DashboardAnalysis";
 import { useNavigate } from 'react-router-dom';
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,6 +14,7 @@ const HeroSection = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
   const [animationComplete, setAnimationComplete] = useState(false);
+  const navigate = useNavigate();
 
   const items = [
     {
@@ -44,10 +45,9 @@ const HeroSection = () => {
 
   // Control body scrolling based on animation state
   useEffect(() => {
-    // Disable scrolling when component mounts
+    // Disable scrolling when component mounts, enable when animation completes or components show
     document.body.style.overflow = showDashboard ? "auto" : "hidden";
 
-    // Enable scrolling when animation completes
     if (animationComplete) {
       document.body.style.overflow = "auto";
     }
@@ -151,15 +151,19 @@ const HeroSection = () => {
     }
   }, [showDashboard]);
 
-  const navigate = useNavigate();
-
   const handleDashboardClick = () => {
     navigate('/dashboard-analysis');
   };
-  // Handle back to home
+
+  // Updated login click handler to use the router navigation
+  const handleLoginClick = () => {
+    navigate('/login');
+  };
+
   // Navigation function to go back to home
   const handleBackToHome = () => {
-    navigate("/"); // Navigate to home route
+    setShowDashboard(false);
+    navigate("/");
   };
 
   // CSS for clip-path hover effect
@@ -202,7 +206,9 @@ const HeroSection = () => {
           <div className="border-b-2 border-r-2 border-white w-[50%] md:py-6 py-4 pl-6 lg:text-[1vw] md:text-[1.2vw] text-[1.2vw]">
             <h1>DeepLens</h1>
           </div>
-          <div className="nav-item border-b-2 border-r-2 border-white w-[20%] md:py-6 py-4 text-center lg:text-[1vw] md:text-[1.2vw] text-[1.2vw]">
+          <div 
+            onClick={handleLoginClick}
+            className="nav-item border-b-2 border-r-2 border-white w-[20%] md:py-6 py-4 text-center lg:text-[1vw] md:text-[1.2vw] text-[1.2vw]">
             <h1>Login to Portal</h1>
           </div>
           <div className="nav-item border-b-2 border-r-2 border-white w-[20%] md:py-6 py-4 text-center lg:text-[1vw] md:text-[1.2vw] text-[1.2vw] bg-white text-[#121A27]">
@@ -246,7 +252,8 @@ const HeroSection = () => {
           </div>
           <div
             ref={(el) => (navbarItemsRef.current[1] = el)}
-            className="nav-item border-b-2 border-r-2 border-white w-[20%] md:py-6 py-4 text-center lg:text-[1vw] md:text-[1.2vw] text-[1.2vw]"
+            onClick={handleLoginClick} 
+            className="nav-item border-b-2 border-r-2 border-white w-[20%] md:py-6 py-4 text-center lg:text-[1vw] md:text-[1.2vw] text-[1.2vw] cursor-pointer"
           >
             <h1>Login to Portal</h1>
           </div>
@@ -270,7 +277,7 @@ const HeroSection = () => {
         <div ref={containerRef} className="relative h-screen">
           {/* Image */}
           <img
-           loading="lazy" 
+            loading="lazy" 
             ref={shipRef}
             className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-50 scale-[0.4] h-full w-full object-contain"
             src="./ship.png"
