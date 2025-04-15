@@ -48,6 +48,83 @@ const DashboardAnalysis = ({ onBackToHome = () => console.warn("onBackToHome not
     source: "AIS"
   });
   const [vessels, setVessels] = useState([]);
+
+// State for trafficking data form
+const [traffickingData, setTraffickingData] = useState({
+  vesselId: "VES-2023-42",
+  timestamp: "",
+  riskScore: "78",
+  lastPort: "Shanghai",
+  nextPort: "Singapore",
+  lat: "3.167",
+  lon: "105.845",
+  cargoType: "Container",
+  flagState: "Panama"
+});
+const [traffickingAlerts, setTraffickingAlerts] = useState([]);
+const [traffickingResponse, setTraffickingResponse] = useState("No trafficking data submitted yet.");
+const handleTraffickingInputChange = (e) => {
+  const { id, value } = e.target;
+  setTraffickingData(prevData => ({
+    ...prevData,
+    [id]: value
+  }));
+};
+useEffect(() => {
+  const now = new Date();
+  const tzoffset = now.getTimezoneOffset() * 60000;
+  const localISOTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0, 16);
+  setVesselData(prevData => ({
+    ...prevData,
+    timestamp: localISOTime
+  }));
+  // Add this line for traffickingData
+  setTraffickingData(prevData => ({
+    ...prevData,
+    timestamp: localISOTime
+  }));
+}, []);
+const handleTraffickingSubmit = async (e) => {
+  e.preventDefault();
+  setTraffickingResponse("Processing vessel intelligence data...");
+  
+  // Simulate trafficking analysis
+  setTimeout(() => {
+    const riskScore = parseInt(traffickingData.riskScore);
+    const randomFactor = Math.floor(Math.random() * 20) - 10; // -10 to +10
+    const calcRiskScore = Math.min(Math.max(riskScore + randomFactor, 0), 100);
+    
+    const response = {
+      vesselId: traffickingData.vesselId,
+      timestamp: new Date(traffickingData.timestamp).toISOString(),
+      riskScore: calcRiskScore,
+      riskLevel: calcRiskScore > 75 ? "High" : calcRiskScore > 50 ? "Medium" : "Low",
+      lat: parseFloat(traffickingData.lat),
+      lon: parseFloat(traffickingData.lon),
+      suspiciousActivity: calcRiskScore > 70,
+      recommendedAction: calcRiskScore > 80 ? "Immediate Inspection" : 
+                          calcRiskScore > 60 ? "Monitor Closely" : "Routine Surveillance",
+      intelligenceNotes: "Vessel analyzed based on historical patterns and current intelligence."
+    };
+    
+    setTraffickingResponse(JSON.stringify(response, null, 2));
+    
+    // Create alert if risk score is high
+    if (calcRiskScore > 65) {
+      const alert = {
+        ...response,
+        alertTime: new Date().toISOString(),
+        message: `HIGH RISK VESSEL: ${response.vesselId} has a risk score of ${calcRiskScore}%`
+      };
+      setTraffickingAlerts(prev => [alert, ...prev].slice(0, 5));
+    }
+  }, 1500);
+};
+
+const clearTraffickingAlerts = () => {
+  setTraffickingAlerts([]);
+};
+
   // State for current alert
   const [currentAlert, setCurrentAlert] = useState(null);
   const [lastUpdated, setLastUpdated] = useState("Never");
@@ -371,12 +448,7 @@ const DashboardAnalysis = ({ onBackToHome = () => console.warn("onBackToHome not
       <div className="bg-[#1A2535] p-6 rounded-lg shadow-lg">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Maritime Intelligence Dashboard</h2>
-          <button
-            onClick={handleBackClick}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white"
-          >
-            Back to Home
-          </button>
+        
         </div>
 
         {/* Tabs */}
@@ -738,15 +810,228 @@ const DashboardAnalysis = ({ onBackToHome = () => console.warn("onBackToHome not
         )}
         {/* Ocean Trafficking Section placeholder */}
         {activeTab === "ocean-trafficking" && (
-          <div className="mb-6">
-            <div className="bg-[#2a3545] p-4 rounded">
-              <h3 className="text-lg font-medium mb-4">Maritime Security Dashboard</h3>
-              <p className="text-gray-300">
-                This section provides intelligence on maritime routes frequently used for illegal trafficking and transport.
-              </p>
+  <div className="mb-6">
+    <div className="flex flex-col lg:flex-row gap-6">
+      {/* Vessel Intelligence Input Panel */}
+      <div className="bg-[#2a3545] p-4 rounded flex-1">
+        <h3 className="text-lg font-medium mb-4">Vessel Intelligence Input</h3>
+        <form onSubmit={handleTraffickingSubmit}>
+          <div className="mb-3">
+            <label htmlFor="vesselId" className="block text-sm font-medium mb-1">Vessel ID:</label>
+            <input 
+              type="text" 
+              id="vesselId" 
+              value={traffickingData.vesselId} 
+              onChange={handleTraffickingInputChange}
+              className="w-full p-2 bg-[#1A2535] border border-gray-700 rounded text-white"
+              required
+            />
+          </div>
+          
+          <div className="mb-3">
+            <label htmlFor="timestamp" className="block text-sm font-medium mb-1">Timestamp (UTC):</label>
+            <input 
+              type="datetime-local" 
+              id="timestamp" 
+              value={traffickingData.timestamp} 
+              onChange={handleTraffickingInputChange}
+              className="w-full p-2 bg-[#1A2535] border border-gray-700 rounded text-white"
+              required
+            />
+          </div>
+          
+          <div className="mb-3">
+            <label htmlFor="riskScore" className="block text-sm font-medium mb-1">
+              Initial Risk Score (0-100):
+            </label>
+            <input 
+              type="number" 
+              id="riskScore" 
+              value={traffickingData.riskScore} 
+              onChange={handleTraffickingInputChange}
+              min="0"
+              max="100"
+              className="w-full p-2 bg-[#1A2535] border border-gray-700 rounded text-white"
+              required
+            />
+          </div>
+          
+          <div className="mb-3">
+            <label htmlFor="lastPort" className="block text-sm font-medium mb-1">
+              Last Port:
+            </label>
+            <input 
+              type="text" 
+              id="lastPort" 
+              value={traffickingData.lastPort} 
+              onChange={handleTraffickingInputChange}
+              className="w-full p-2 bg-[#1A2535] border border-gray-700 rounded text-white"
+              required
+            />
+          </div>
+          
+          <div className="mb-3">
+            <label htmlFor="nextPort" className="block text-sm font-medium mb-1">Next Port:</label>
+            <input 
+              type="text" 
+              id="nextPort" 
+              value={traffickingData.nextPort} 
+              onChange={handleTraffickingInputChange}
+              className="w-full p-2 bg-[#1A2535] border border-gray-700 rounded text-white"
+              required
+            />
+          </div>
+          
+          <div className="mb-3">
+            <label htmlFor="lat" className="block text-sm font-medium mb-1">Latitude:</label>
+            <input 
+              type="number" 
+              id="lat" 
+              value={traffickingData.lat} 
+              onChange={handleTraffickingInputChange}
+              min="-90"
+              max="90"
+              step="0.0000000001"
+              className="w-full p-2 bg-[#1A2535] border border-gray-700 rounded text-white"
+              required
+            />
+          </div>
+          
+          <div className="mb-3">
+            <label htmlFor="lon" className="block text-sm font-medium mb-1">Longitude:</label>
+            <input 
+              type="number" 
+              id="lon" 
+              value={traffickingData.lon} 
+              onChange={handleTraffickingInputChange}
+              min="-180"
+              max="180"
+              step="0.0000000001"
+              className="w-full p-2 bg-[#1A2535] border border-gray-700 rounded text-white"
+              required
+            />
+          </div>
+          
+          <div className="mb-3">
+            <label htmlFor="cargoType" className="block text-sm font-medium mb-1">Cargo Type:</label>
+            <select 
+              id="cargoType" 
+              value={traffickingData.cargoType} 
+              onChange={handleTraffickingInputChange}
+              className="w-full p-2 bg-[#1A2535] border border-gray-700 rounded text-white"
+            >
+              <option value="Container">Container</option>
+              <option value="Bulk">Bulk</option>
+              <option value="Tanker">Tanker</option>
+              <option value="Passenger">Passenger</option>
+              <option value="Unknown">Unknown</option>
+            </select>
+          </div>
+          
+          <div className="mb-4">
+            <label htmlFor="flagState" className="block text-sm font-medium mb-1">Flag State:</label>
+            <input 
+              type="text" 
+              id="flagState" 
+              value={traffickingData.flagState} 
+              onChange={handleTraffickingInputChange}
+              className="w-full p-2 bg-[#1A2535] border border-gray-700 rounded text-white"
+              required
+            />
+          </div>
+          
+          <button
+            type="submit"
+            className="w-full p-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium"
+          >
+            Submit Intelligence Data
+          </button>
+          
+          <div className="flex gap-2 mt-4">
+            <button 
+              type="button" 
+              onClick={clearTraffickingAlerts}
+              className="flex-1 p-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded"
+            >
+              Clear Alerts
+            </button>
+          </div>
+        </form>
+      </div>
+      
+      {/* Intelligence Response Panel */}
+      <div className="bg-[#2a3545] p-4 rounded flex-1">
+        <h3 className="text-lg font-medium mb-4">Intelligence Response</h3>
+        <pre className="bg-[#1A2535] p-3 rounded text-sm text-gray-300 overflow-auto max-h-64">
+          {traffickingResponse}
+        </pre>
+        
+        <div className="mt-4">
+          <h3 className="text-lg font-medium mb-2">Vessel Location</h3>
+          <div className="bg-[#1A2535] p-3 rounded">
+            <div style={{ height: "300px", width: "100%" }}>
+              <MapContainer 
+                center={[parseFloat(traffickingData.lat), parseFloat(traffickingData.lon)]} 
+                zoom={5} 
+                style={{ height: "100%", width: "100%" }}
+              >
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
+                <Marker position={[parseFloat(traffickingData.lat), parseFloat(traffickingData.lon)]}>
+                  <Popup>
+                    Vessel ID: {traffickingData.vesselId}<br />
+                    Last Port: {traffickingData.lastPort}<br />
+                    Next Port: {traffickingData.nextPort}<br />
+                    Flag: {traffickingData.flagState}
+                  </Popup>
+                </Marker>
+                <MapCenterHandler lat={parseFloat(traffickingData.lat)} lng={parseFloat(traffickingData.lon)} />
+              </MapContainer>
             </div>
           </div>
-        )}
+        </div>
+      </div>
+    </div>
+    
+    {/* Trafficking Alerts */}
+    <div className="bg-[#2a3545] p-4 rounded mt-6">
+      <h3 className="text-lg font-medium mb-4">Intelligence Alerts</h3>
+      
+      {traffickingAlerts.length === 0 ? (
+        <p className="text-gray-400">No intelligence alerts at this time.</p>
+      ) : (
+        <div className="space-y-3">
+          {traffickingAlerts.map((alert, index) => (
+            <div key={index} className={`border-l-4 p-3 rounded bg-[#1A2535] ${
+              alert.riskScore > 80 ? "border-red-600" : 
+              alert.riskScore > 60 ? "border-yellow-600" : "border-blue-600"
+            }`}>
+              <h4 className="text-md font-semibold">
+                {alert.riskScore > 80 ? "HIGH RISK ALERT" : "Risk Assessment"}
+              </h4>
+              <p className="text-sm"><strong>Vessel ID:</strong> {alert.vesselId}</p>
+              <p className="text-sm"><strong>Time:</strong> {new Date(alert.timestamp).toLocaleString()}</p>
+              <p className="text-sm">
+                <strong>Risk Score:</strong> {alert.riskScore}/100 
+                <span className={`ml-2 px-2 py-0.5 rounded text-xs ${
+                  alert.riskScore > 80 ? "bg-red-700" : 
+                  alert.riskScore > 60 ? "bg-yellow-700" : "bg-blue-700"
+                }`}>
+                  {alert.riskLevel} Risk
+                </span>
+              </p>
+              <p className="text-sm"><strong>Route:</strong> {alert.lastPort} → {alert.nextPort}</p>
+              <p className="text-sm"><strong>Recommended Action:</strong> {alert.recommendedAction}</p>
+              <p className="text-sm"><strong>Message:</strong> {alert.message}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+)}
       </div>
     </div>
   );

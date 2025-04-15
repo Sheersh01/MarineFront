@@ -939,7 +939,7 @@ export default function InfiniteMenu({ items = [] }) {
               select-none
               absolute
               font-black
-              [font-size:4rem]
+              [font-size:2.5rem]
               left-[1.6em]
               top-1/2
               transform
