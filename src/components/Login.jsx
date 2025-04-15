@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 
 const Login = ({ onBackToHome }) => {
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate();
   
   // Tab state
   const [activeTab, setActiveTab] = useState("signup");
@@ -12,6 +12,7 @@ const Login = ({ onBackToHome }) => {
     firstName: "",
     lastName: "",
     email: "",
+    password: "", // Added password field
     phone: "",
     postalCode: "",
     country: "",
@@ -19,7 +20,7 @@ const Login = ({ onBackToHome }) => {
   });
   
   const [signinEmail, setSigninEmail] = useState("");
-  const [signinPassword, setSigninPassword] = useState(""); // Added password state
+  const [signinPassword, setSigninPassword] = useState("");
   
   // UI states
   const [errors, setErrors] = useState({});
@@ -124,6 +125,12 @@ const Login = ({ onBackToHome }) => {
       isValid = false;
     }
     
+    // Password validation - must be at least 8 characters
+    if (!signupData.password || signupData.password.length < 8) {
+      newErrors["signup-password"] = true;
+      isValid = false;
+    }
+    
     if (!signupData.phone || !/^\+?[0-9\-\s]{8,20}$/.test(signupData.phone)) {
       newErrors["signup-phone"] = true;
       isValid = false;
@@ -171,6 +178,7 @@ const Login = ({ onBackToHome }) => {
           first_name: signupData.firstName,
           last_name: signupData.lastName,
           email: signupData.email,
+          password: signupData.password,
           phone_number: signupData.phone,
           postal_code: signupData.postalCode,
           country: signupData.country,
@@ -193,6 +201,7 @@ const Login = ({ onBackToHome }) => {
           firstName: "",
           lastName: "",
           email: "",
+          password: "",
           phone: "",
           postalCode: "",
           country: "",
@@ -226,6 +235,7 @@ const Login = ({ onBackToHome }) => {
         firstName: "",
         lastName: "",
         email: "",
+        password: "",
         phone: "",
         postalCode: "",
         country: "",
@@ -326,7 +336,8 @@ const Login = ({ onBackToHome }) => {
       */
       
       // Simulation for demo:
-      const simulatedName = "User";
+      // Extract the name from the email (everything before @)
+      const simulatedName = signinEmail.split('@')[0] || "User";
       
       setMessages({
         ...messages,
@@ -383,213 +394,6 @@ const Login = ({ onBackToHome }) => {
     });
   };
   
-  // Styles
-  const styles = `
-    :root {
-      --primary-color: #3498db;
-      --secondary-color: #2980b9;
-      --error-color: #e74c3c;
-      --success-color: #2ecc71;
-      --text-color: #333;
-      --light-bg: #f9f9f9;
-    }
-
-    .login-container {
-      max-width: 800px;
-      margin: 0 auto;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-      color: var(--text-color);
-    }
-
-    .login-tabs {
-      display: flex;
-      background-color: #f1f1f1;
-    }
-
-    .login-tab-button {
-      flex: 1;
-      background: none;
-      border: none;
-      padding: 15px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    .login-tab-button.active {
-      background-color: var(--primary-color);
-      color: white;
-    }
-
-    .login-tab-content {
-      display: none;
-      padding: 30px;
-    }
-
-    .login-tab-content.active {
-      display: block;
-    }
-
-    .login-h1 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: var(--primary-color);
-    }
-
-    .login-form-group {
-      margin-bottom: 20px;
-    }
-
-    .login-label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
-
-    .login-input {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 16px;
-    }
-
-    .login-error {
-      color: var(--error-color);
-      font-size: 14px;
-      margin-top: 5px;
-      display: none;
-    }
-
-    .login-error.show {
-      display: block;
-    }
-
-    .login-button {
-      width: 100%;
-      padding: 12px;
-      background-color: var(--primary-color);
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    .login-button:hover {
-      background-color: var(--secondary-color);
-    }
-
-    .login-message {
-      text-align: center;
-      padding: 15px;
-      margin: 15px 0;
-      border-radius: 5px;
-      display: none;
-    }
-
-    .login-message.show {
-      display: block;
-    }
-
-    .login-success-message {
-      background-color: rgba(46, 204, 113, 0.2);
-      color: var(--success-color);
-    }
-
-    .login-error-message {
-      background-color: rgba(231, 76, 60, 0.2);
-      color: var(--error-color);
-    }
-
-    .login-welcome-container {
-      text-align: center;
-      padding: 40px;
-    }
-
-    .login-welcome-container h2 {
-      color: var(--primary-color);
-      margin-bottom: 20px;
-    }
-
-    .login-welcome-container p {
-      font-size: 18px;
-      margin-bottom: 30px;
-    }
-
-    .login-logout-btn {
-      background-color: #ccc;
-      color: #333;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background-color 0.3s;
-      margin-right: 10px;
-    }
-
-    .login-logout-btn:hover {
-      background-color: #bbb;
-    }
-
-    .login-home-btn {
-      background-color: var(--primary-color);
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background-color 0.3s;
-    }
-
-    .login-home-btn:hover {
-      background-color: var(--secondary-color);
-    }
-
-    .login-form-row {
-      display: flex;
-      gap: 20px;
-    }
-
-    .login-form-row .login-form-group {
-      flex: 1;
-    }
-
-    @media (max-width: 768px) {
-      .login-form-row {
-        flex-direction: column;
-        gap: 0;
-      }
-    }
-    
-    .home-button {
-      display: block;
-      width: 100%;
-      max-width: 200px;
-      margin: 20px auto 0;
-      padding: 10px;
-      background-color: #333;
-      color: white;
-      text-align: center;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-      text-decoration: none;
-    }
-    
-    .home-button:hover {
-      background-color: #555;
-    }
-  `;
-  
   // Handler for navigating to home route
   const handleNavigateHome = () => {
     navigate('/');
@@ -599,19 +403,27 @@ const Login = ({ onBackToHome }) => {
   if (isLoggedIn) {
     return (
       <div className="bg-[#121A27] flex items-center justify-center min-h-screen px-4">
-        <style>{styles}</style>
-        <div className="login-container">
-          <div className="login-welcome-container">
-            <h2>Welcome to DeepLens Portal</h2>
-            <p>Hello, <span id="user-name">{userName}</span>!</p>
-            <p>You have successfully signed in.</p>
-            <div className="flex justify-center mt-4">
-              <button className="login-logout-btn" onClick={handleLogout}>Log Out</button>
-              <button className="login-home-btn" onClick={onBackToHome}>Return to Dashboard</button>
+        <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden text-gray-800">
+          <div className="text-center py-10 px-6">
+            <h2 className="text-2xl font-bold text-blue-500 mb-5">Welcome to DeepLens Portal</h2>
+            <p className="text-lg mb-2">Hello, <span id="user-name">{userName}</span>!</p>
+            <p className="text-lg mb-6">You have successfully signed in.</p>
+            <div className="flex justify-center mt-4 space-x-4">
+              <button 
+                className="px-5 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors" 
+                onClick={handleLogout}
+              >
+                Log Out
+              </button>
+              <button 
+                className="px-5 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors" 
+                onClick={onBackToHome || handleNavigateHome}
+              >
+                Return to Dashboard
+              </button>
             </div>
-            {/* New button to navigate to home route */}
             <button 
-              className="home-button mt-6" 
+              className="mt-6 px-5 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition-colors mx-auto block"
               onClick={handleNavigateHome}
             >
               Go to Home Page
@@ -624,149 +436,166 @@ const Login = ({ onBackToHome }) => {
   
   return (
     <div className="bg-[#121A27] flex items-center justify-center min-h-screen px-4">
-      <style>{styles}</style>
-      
-      <div className="login-container">
-        <div className="login-tabs">
+      <div className="max-w-3xl w-full mx-auto bg-white rounded-lg shadow-lg overflow-hidden text-gray-800">
+        <div className="flex bg-gray-100">
           <button 
-            className={`login-tab-button ${activeTab === "signup" ? "active" : ""}`} 
+            className={`flex-1 py-4 font-bold text-base border-none transition-colors ${activeTab === "signup" ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-700"}`}
             onClick={() => handleTabChange("signup")}
           >
             Sign Up
           </button>
           <button 
-            className={`login-tab-button ${activeTab === "signin" ? "active" : ""}`} 
+            className={`flex-1 py-4 font-bold text-base border-none transition-colors ${activeTab === "signin" ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-700"}`}
             onClick={() => handleTabChange("signin")}
           >
             Sign In
           </button>
         </div>
 
-        <div className={`login-tab-content ${activeTab === "signup" ? "active" : ""}`}>
-          <h1 className="login-h1">Create an Account</h1>
+        <div className={`p-8 ${activeTab === "signup" ? "block" : "hidden"}`}>
+          <h1 className="text-2xl font-bold text-center text-blue-500 mb-6">Create an Account</h1>
           <form onSubmit={handleSignupSubmit}>
-            <div className="login-form-row">
-              <div className="login-form-group">
-                <label className="login-label" htmlFor="signup-firstName">First Name</label>
+            <div className="flex flex-col md:flex-row md:gap-5 mb-4">
+              <div className="flex-1 mb-4 md:mb-0">
+                <label className="block font-semibold mb-2" htmlFor="signup-firstName">First Name</label>
                 <input 
                   type="text" 
                   id="signup-firstName" 
-                  className="login-input" 
+                  className="w-full px-3 py-3 border border-gray-300 rounded text-base" 
                   value={signupData.firstName}
                   onChange={handleSignupChange}
                   required 
                 />
-                <div className={`login-error ${errors["signup-firstName"] ? "show" : ""}`}>
+                <div className={`text-red-500 text-sm mt-1 ${errors["signup-firstName"] ? "block" : "hidden"}`}>
                   Please enter your first name
                 </div>
               </div>
-              <div className="login-form-group">
-                <label className="login-label" htmlFor="signup-lastName">Last Name</label>
+              <div className="flex-1">
+                <label className="block font-semibold mb-2" htmlFor="signup-lastName">Last Name</label>
                 <input 
                   type="text" 
                   id="signup-lastName" 
-                  className="login-input" 
+                  className="w-full px-3 py-3 border border-gray-300 rounded text-base" 
                   value={signupData.lastName}
                   onChange={handleSignupChange}
                   required 
                 />
-                <div className={`login-error ${errors["signup-lastName"] ? "show" : ""}`}>
+                <div className={`text-red-500 text-sm mt-1 ${errors["signup-lastName"] ? "block" : "hidden"}`}>
                   Please enter your last name
                 </div>
               </div>
             </div>
 
-            <div className="login-form-group">
-              <label className="login-label" htmlFor="signup-email">Email Address</label>
+            <div className="mb-4">
+              <label className="block font-semibold mb-2" htmlFor="signup-email">Email Address</label>
               <input 
                 type="email" 
                 id="signup-email" 
-                className="login-input" 
+                className="w-full px-3 py-3 border border-gray-300 rounded text-base" 
                 value={signupData.email}
                 onChange={handleSignupChange}
                 required 
               />
-              <div className={`login-error ${errors["signup-email"] ? "show" : ""}`}>
+              <div className={`text-red-500 text-sm mt-1 ${errors["signup-email"] ? "block" : "hidden"}`}>
                 Please enter a valid email address
               </div>
             </div>
 
-            <div className="login-form-row">
-              <div className="login-form-group">
-                <label className="login-label" htmlFor="signup-phone">Phone Number</label>
+            <div className="mb-4">
+              <label className="block font-semibold mb-2" htmlFor="signup-password">Password</label>
+              <input 
+                type="password" 
+                id="signup-password" 
+                className="w-full px-3 py-3 border border-gray-300 rounded text-base" 
+                value={signupData.password}
+                onChange={handleSignupChange}
+                required 
+              />
+              <div className={`text-red-500 text-sm mt-1 ${errors["signup-password"] ? "block" : "hidden"}`}>
+                Password must be at least 8 characters
+              </div>
+            </div>
+
+            <div className="flex flex-col md:flex-row md:gap-5 mb-4">
+              <div className="flex-1 mb-4 md:mb-0">
+                <label className="block font-semibold mb-2" htmlFor="signup-phone">Phone Number</label>
                 <input 
                   type="tel" 
                   id="signup-phone" 
-                  className="login-input" 
+                  className="w-full px-3 py-3 border border-gray-300 rounded text-base" 
                   placeholder="+1234567890" 
                   value={signupData.phone}
                   onChange={handleSignupChange}
                   required 
                 />
-                <div className={`login-error ${errors["signup-phone"] ? "show" : ""}`}>
+                <div className={`text-red-500 text-sm mt-1 ${errors["signup-phone"] ? "block" : "hidden"}`}>
                   Please enter a valid phone number
                 </div>
               </div>
-              <div className="login-form-group">
-                <label className="login-label" htmlFor="signup-postalCode">Postal Code</label>
+              <div className="flex-1">
+                <label className="block font-semibold mb-2" htmlFor="signup-postalCode">Postal Code</label>
                 <input 
                   type="text" 
                   id="signup-postalCode" 
-                  className="login-input" 
+                  className="w-full px-3 py-3 border border-gray-300 rounded text-base" 
                   value={signupData.postalCode}
                   onChange={handleSignupChange}
                   required 
                 />
-                <div className={`login-error ${errors["signup-postalCode"] ? "show" : ""}`}>
+                <div className={`text-red-500 text-sm mt-1 ${errors["signup-postalCode"] ? "block" : "hidden"}`}>
                   Please enter your postal code
                 </div>
               </div>
             </div>
 
-            <div className="login-form-row">
-              <div className="login-form-group">
-                <label className="login-label" htmlFor="signup-country">Country</label>
+            <div className="flex flex-col md:flex-row md:gap-5 mb-4">
+              <div className="flex-1 mb-4 md:mb-0">
+                <label className="block font-semibold mb-2" htmlFor="signup-country">Country</label>
                 <input 
                   type="text" 
                   id="signup-country" 
-                  className="login-input" 
+                  className="w-full px-3 py-3 border border-gray-300 rounded text-base" 
                   value={signupData.country}
                   onChange={handleSignupChange}
                   required 
                 />
-                <div className={`login-error ${errors["signup-country"] ? "show" : ""}`}>
+                <div className={`text-red-500 text-sm mt-1 ${errors["signup-country"] ? "block" : "hidden"}`}>
                   Please enter your country
                 </div>
               </div>
-              <div className="login-form-group">
-                <label className="login-label" htmlFor="signup-dob">Date of Birth</label>
+              <div className="flex-1">
+                <label className="block font-semibold mb-2" htmlFor="signup-dob">Date of Birth</label>
                 <input 
                   type="date" 
                   id="signup-dob" 
-                  className="login-input" 
+                  className="w-full px-3 py-3 border border-gray-300 rounded text-base" 
                   value={signupData.dob}
                   onChange={handleSignupChange}
                   required 
                 />
-                <div className={`login-error ${errors["signup-dob"] ? "show" : ""}`}>
+                <div className={`text-red-500 text-sm mt-1 ${errors["signup-dob"] ? "block" : "hidden"}`}>
                   Please enter a valid date of birth
                 </div>
               </div>
             </div>
 
-            <div className={`login-message login-success-message ${messages.signupSuccess ? "show" : ""}`}>
+            <div className={`text-center py-4 px-3 my-4 rounded ${messages.signupSuccess ? "block bg-green-100 text-green-600" : "hidden"}`}>
               Registration successful! You can now sign in.
             </div>
-            <div className={`login-message login-error-message ${messages.signupError ? "show" : ""}`}>
+            <div className={`text-center py-4 px-3 my-4 rounded ${messages.signupError ? "block bg-red-100 text-red-600" : "hidden"}`}>
               {messages.signupErrorMessage || "Registration failed. Please try again."}
             </div>
 
-            <button type="submit" className="login-button">Sign Up</button>
+            <button 
+              type="submit" 
+              className="w-full py-3 bg-blue-500 text-white rounded font-bold hover:bg-blue-600 transition-colors"
+            >
+              Sign Up
+            </button>
             
-            {/* New button to navigate to home route */}
             <button 
               type="button" 
-              className="home-button" 
+              className="w-full max-w-xs mx-auto mt-5 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition-colors block"
               onClick={handleNavigateHome}
             >
               Back to Home
@@ -774,63 +603,66 @@ const Login = ({ onBackToHome }) => {
           </form>
         </div>
 
-        <div className={`login-tab-content ${activeTab === "signin" ? "active" : ""}`}>
-          <h1 className="login-h1">Welcome Back</h1>
+        <div className={`p-8 ${activeTab === "signin" ? "block" : "hidden"}`}>
+          <h1 className="text-2xl font-bold text-center text-blue-500 mb-6">Welcome Back</h1>
           <form onSubmit={handleSigninSubmit}>
-            <div className="login-form-group">
-              <label className="login-label" htmlFor="signin-email">Email Address</label>
+            <div className="mb-4">
+              <label className="block font-semibold mb-2" htmlFor="signin-email">Email Address</label>
               <input 
                 type="email" 
                 id="signin-email" 
-                className="login-input" 
+                className="w-full px-3 py-3 border border-gray-300 rounded text-base" 
                 value={signinEmail}
                 onChange={handleSigninChange}
                 required 
               />
-              <div className={`login-error ${errors["signin-email"] ? "show" : ""}`}>
+              <div className={`text-red-500 text-sm mt-1 ${errors["signin-email"] ? "block" : "hidden"}`}>
                 Please enter a valid email address
               </div>
             </div>
             
-            {/* New password field */}
-            <div className="login-form-group">
-              <label className="login-label" htmlFor="signin-password">Password</label>
+            <div className="mb-4">
+              <label className="block font-semibold mb-2" htmlFor="signin-password">Password</label>
               <input 
                 type="password" 
                 id="signin-password" 
-                className="login-input" 
+                className="w-full px-3 py-3 border border-gray-300 rounded text-base" 
                 value={signinPassword}
                 onChange={handleSigninChange}
                 required 
               />
-              <div className={`login-error ${errors["signin-password"] ? "show" : ""}`}>
+              <div className={`text-red-500 text-sm mt-1 ${errors["signin-password"] ? "block" : "hidden"}`}>
                 Please enter your password
               </div>
             </div>
 
-            <div className={`login-message login-success-message ${messages.signinSuccess ? "show" : ""}`}>
+            <div className={`text-center py-4 px-3 my-4 rounded ${messages.signinSuccess ? "block bg-green-100 text-green-600" : "hidden"}`}>
               Sign-in successful!
             </div>
-            <div className={`login-message login-error-message ${messages.signinError ? "show" : ""}`}>
+            <div className={`text-center py-4 px-3 my-4 rounded ${messages.signinError ? "block bg-red-100 text-red-600" : "hidden"}`}>
               {messages.signinErrorMessage || "Sign-in failed. Please try again."}
             </div>
 
-            <button type="submit" className="login-button">Sign In</button>
+            <button 
+              type="submit" 
+              className="w-full py-3 bg-blue-500 text-white rounded font-bold hover:bg-blue-600 transition-colors"
+            >
+              Sign In
+            </button>
             
             <div className="mt-4 text-center">
               <button 
                 type="button" 
                 onClick={onBackToHome} 
-                className="text-[#3498db] hover:text-[#2980b9] text-sm"
+                className="text-blue-500 hover:text-blue-700 text-sm"
               >
                 Return to dashboard
               </button>
             </div>
             
-            {/* New button to navigate to home route */}
             <button 
               type="button" 
-              className="home-button" 
+              className="w-full max-w-xs mx-auto mt-5 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition-colors block"
               onClick={handleNavigateHome}
             >
               Back to Home

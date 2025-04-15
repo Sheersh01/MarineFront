@@ -14,6 +14,8 @@ const HeroSection = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
   const [animationComplete, setAnimationComplete] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState("");
   const navigate = useNavigate();
 
   const items = [
@@ -42,6 +44,38 @@ const HeroSection = () => {
       description: "Maritime routes used for illegal activities",
     },
   ];
+
+  // Check login status on component mount and whenever the component is focused
+  useEffect(() => {
+    const checkLoginStatus = () => {
+      // Use the same keys as in the Login component
+      const userId = localStorage.getItem('userId');
+      const storedUserName = localStorage.getItem('userName');
+      
+      if (userId && storedUserName) {
+        setIsLoggedIn(true);
+        setUserName(storedUserName);
+      } else {
+        setIsLoggedIn(false);
+        setUserName("");
+      }
+    };
+    
+    // Check initially
+    checkLoginStatus();
+    
+    // Add event listener for when the window gets focus (user returns from login page)
+    window.addEventListener('focus', checkLoginStatus);
+    
+    // Also check periodically
+    const interval = setInterval(checkLoginStatus, 1000);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('focus', checkLoginStatus);
+      clearInterval(interval);
+    };
+  }, []);
 
   // Control body scrolling based on animation state
   useEffect(() => {
@@ -152,12 +186,26 @@ const HeroSection = () => {
   }, [showDashboard]);
 
   const handleDashboardClick = () => {
-    navigate('/dashboard-analysis');
+    if (isLoggedIn) {
+      navigate('/dashboard-analysis');
+    } else {
+      alert("Please login to access the dashboard.");
+    }
   };
 
-  // Updated login click handler to use the router navigation
+  // Updated login click handler
   const handleLoginClick = () => {
-    navigate('/login');
+    if (isLoggedIn) {
+      // If already logged in, log out
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userName');
+      setIsLoggedIn(false);
+      setUserName("");
+      alert("You have been logged out successfully.");
+    } else {
+      // If not logged in, navigate to login page
+      navigate('/login');
+    }
   };
 
   // Navigation function to go back to home
@@ -196,6 +244,19 @@ const HeroSection = () => {
   .nav-item:hover::before {
     transform: translateX(0);
   }
+
+  .disabled-nav-item {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .disabled-nav-item:hover::before {
+    transform: translateX(-101%);
+  }
+  
+  .disabled-nav-item:hover {
+    color: white;
+  }
 `;
 
   // Render Dashboard Analysis Component
@@ -208,8 +269,9 @@ const HeroSection = () => {
           </div>
           <div 
             onClick={handleLoginClick}
-            className="nav-item border-b-2 border-r-2 border-white w-[20%] md:py-6 py-4 text-center lg:text-[1vw] md:text-[1.2vw] text-[1.2vw]">
-            <h1>Login to Portal</h1>
+            className="nav-item border-b-2 border-r-2 border-white w-[20%] md:py-6 py-4 text-center lg:text-[1vw] md:text-[1.2vw] text-[1.2vw]"
+          >
+            <h1>{isLoggedIn ? `Hello, ${userName}` : "Login to Portal"}</h1>
           </div>
           <div className="nav-item border-b-2 border-r-2 border-white w-[20%] md:py-6 py-4 text-center lg:text-[1vw] md:text-[1.2vw] text-[1.2vw] bg-white text-[#121A27]">
             <h1>Dashboard Analytics</h1>
@@ -255,12 +317,12 @@ const HeroSection = () => {
             onClick={handleLoginClick} 
             className="nav-item border-b-2 border-r-2 border-white w-[20%] md:py-6 py-4 text-center lg:text-[1vw] md:text-[1.2vw] text-[1.2vw] cursor-pointer"
           >
-            <h1>Login to Portal</h1>
+            <h1>{isLoggedIn ? `Hello, ${userName}` : "Login to Portal"}</h1>
           </div>
           <div
             ref={(el) => (navbarItemsRef.current[2] = el)}
             onClick={handleDashboardClick} 
-            className="nav-item border-b-2 border-r-2 border-white w-[20%] md:py-6 py-4 text-center lg:text-[1vw] md:text-[1.2vw] text-[1.2vw] cursor-pointer"
+            className={`${isLoggedIn ? 'nav-item' : 'nav-item disabled-nav-item'} border-b-2 border-r-2 border-white w-[20%] md:py-6 py-4 text-center lg:text-[1vw] md:text-[1.2vw] text-[1.2vw]`}
           >
             <h1>Dashboard Analytics</h1>
           </div>
