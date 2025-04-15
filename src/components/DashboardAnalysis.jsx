@@ -72,6 +72,8 @@ const DashboardAnalysis = ({ onBackToHome = () => console.warn("onBackToHome not
   });
   const [traffickingAlerts, setTraffickingAlerts] = useState([]);
   const [traffickingResponse, setTraffickingResponse] = useState("No trafficking data submitted yet.");
+  // Add new state for trafficking land/water status
+  const [traffickingLocationStatus, setTraffickingLocationStatus] = useState(null);
   
   // State for current alert
   const [currentAlert, setCurrentAlert] = useState(null);
@@ -122,6 +124,10 @@ const DashboardAnalysis = ({ onBackToHome = () => console.warn("onBackToHome not
       ...prevData,
       [id]: value
     }));
+    // Reset location status when coordinates are changed
+    if (id === 'lat' || id === 'lon') {
+      setTraffickingLocationStatus(null);
+    }
   };
   
   // Set default timestamp to current time on component mount
@@ -248,8 +254,44 @@ const DashboardAnalysis = ({ onBackToHome = () => console.warn("onBackToHome not
   const handleTraffickingSubmit = async (e) => {
     e.preventDefault();
     setTraffickingResponse("Processing vessel intelligence data...");
+    setTraffickingLocationStatus("checking");
+
+    const latNum = parseFloat(traffickingData.lat);
+    const lonNum = parseFloat(traffickingData.lon);
     
-    // Simulate trafficking analysis
+    // Check if location is on water
+    try {
+      const water = await isWater(latNum, lonNum);
+      setTraffickingLocationStatus(water ? "water" : "land");
+      
+      if (!water) {
+        setTraffickingResponse("⚠️ That point is on land. Intelligence analysis may be less accurate.");
+        
+        // Create an alert for land location
+        const alert = {
+          vesselId: traffickingData.vesselId,
+          timestamp: new Date(traffickingData.timestamp).toISOString(),
+          riskScore: parseInt(traffickingData.riskScore) + 15, // Increase risk score for land location
+          riskLevel: "High",
+          lat: latNum,
+          lon: lonNum,
+          suspiciousActivity: true,
+          recommendedAction: "Immediate Investigation",
+          intelligenceNotes: "LOCATION ERROR: The specified coordinates are on land. Possible data falsification.",
+          alertTime: new Date().toISOString(),
+          message: `LOCATION ERROR: Vessel ${traffickingData.vesselId} reporting position on land! Possible AIS/GPS spoofing.`
+        };
+        
+        setTraffickingAlerts(prev => [alert, ...prev].slice(0, 5));
+        return;
+      }
+    } catch (err) {
+      console.warn("Geocode failed, assuming water", err);
+      setTraffickingLocationStatus("unknown");
+      setTraffickingResponse("⚠️ Location validation failed. Proceeding with analysis assuming water.");
+    }
+    
+    // Continue with simulation
     setTimeout(() => {
       const riskScore = parseInt(traffickingData.riskScore);
       const randomFactor = Math.floor(Math.random() * 20) - 10; // -10 to +10
@@ -260,8 +302,8 @@ const DashboardAnalysis = ({ onBackToHome = () => console.warn("onBackToHome not
         timestamp: new Date(traffickingData.timestamp).toISOString(),
         riskScore: calcRiskScore,
         riskLevel: calcRiskScore > 75 ? "High" : calcRiskScore > 50 ? "Medium" : "Low",
-        lat: parseFloat(traffickingData.lat),
-        lon: parseFloat(traffickingData.lon),
+        lat: latNum,
+        lon: lonNum,
         suspiciousActivity: calcRiskScore > 70,
         recommendedAction: calcRiskScore > 80 ? "Immediate Inspection" : 
                           calcRiskScore > 60 ? "Monitor Closely" : "Routine Surveillance",
@@ -472,6 +514,22 @@ const DashboardAnalysis = ({ onBackToHome = () => console.warn("onBackToHome not
   // Function to render location status indicator
   const renderLocationStatus = () => {
     switch (locationStatus) {
+      case "checking":
+        return <span className="py-1 px-2 bg-yellow-600 text-white text-xs rounded">Checking location...</span>;
+      case "water":
+        return <span className="py-1 px-2 bg-blue-600 text-white text-xs rounded">✓ Water confirmed</span>;
+      case "land":
+        return <span className="py-1 px-2 bg-red-600 text-white text-xs rounded">⚠️ Land detected</span>;
+      case "unknown":
+        return <span className="py-1 px-2 bg-gray-600 text-white text-xs rounded">? Location status unknown</span>;
+      default:
+        return null;
+    }
+  };
+
+  // Function to render trafficking location status indicator
+  const renderTraffickingLocationStatus = () => {
+    switch (traffickingLocationStatus) {
       case "checking":
         return <span className="py-1 px-2 bg-yellow-600 text-white text-xs rounded">Checking location...</span>;
       case "water":
@@ -1060,6 +1118,12 @@ const DashboardAnalysis = ({ onBackToHome = () => console.warn("onBackToHome not
             Submit Intelligence Data
           </button>
           
+          {traffickingLocationStatus === "land" && (
+            <div className="mt-2 bg-red-800 text-white px-3 py-1 rounded-md text-sm">
+              ⚠️ Current location is on land! Maritime analysis unavailable.
+            </div>
+          )}
+          
           <div className="flex gap-2 mt-4">
             <button 
               type="button" 
@@ -1076,7 +1140,9 @@ const DashboardAnalysis = ({ onBackToHome = () => console.warn("onBackToHome not
       <div className="bg-[#2a3545] p-4 rounded flex-1">
         <h3 className="text-lg font-medium mb-4">Intelligence Response</h3>
         <pre className="bg-[#1A2535] p-3 rounded text-sm text-gray-300 overflow-auto max-h-64">
-          {traffickingResponse}
+          {traffickingLocationStatus === "land" 
+            ? "ERROR: The specified coordinates are on land. Maritime intelligence analysis is only available for water locations."
+            : traffickingResponse}
         </pre>
         
         <div className="mt-4">
@@ -1098,10 +1164,21 @@ const DashboardAnalysis = ({ onBackToHome = () => console.warn("onBackToHome not
                     Last Port: {traffickingData.lastPort}<br />
                     Next Port: {traffickingData.nextPort}<br />
                     Flag: {traffickingData.flagState}
+                    {traffickingLocationStatus === "land" && <><br /><strong className="text-red-500">WARNING: ON LAND</strong></>}
                   </Popup>
                 </Marker>
                 <MapCenterHandler lat={parseFloat(traffickingData.lat)} lng={parseFloat(traffickingData.lon)} />
               </MapContainer>
+            </div>
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-gray-400 mt-2">
+                Last updated: <span>{new Date().toLocaleString()}</span>
+              </p>
+              {traffickingLocationStatus === "land" && (
+                <div className="mt-2 bg-red-800 text-white px-3 py-1 rounded-md text-sm">
+                  ⚠️ Current location is on land! Maritime analysis unavailable.
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -1112,35 +1189,58 @@ const DashboardAnalysis = ({ onBackToHome = () => console.warn("onBackToHome not
     <div className="bg-[#2a3545] p-4 rounded mt-6">
       <h3 className="text-lg font-medium mb-4">Intelligence Alerts</h3>
       
-      {traffickingAlerts.length === 0 ? (
-        <p className="text-gray-400">No intelligence alerts at this time.</p>
-      ) : (
-        <div className="space-y-3">
-          {traffickingAlerts.map((alert, index) => (
-            <div key={index} className={`border-l-4 p-3 rounded bg-[#1A2535] ${
-              alert.riskScore > 80 ? "border-red-600" : 
-              alert.riskScore > 60 ? "border-yellow-600" : "border-blue-600"
-            }`}>
-              <h4 className="text-md font-semibold">
-                {alert.riskScore > 80 ? "HIGH RISK ALERT" : "Risk Assessment"}
-              </h4>
-              <p className="text-sm"><strong>Vessel ID:</strong> {alert.vesselId}</p>
-              <p className="text-sm"><strong>Time:</strong> {new Date(alert.timestamp).toLocaleString()}</p>
-              <p className="text-sm">
-                <strong>Risk Score:</strong> {alert.riskScore}/100 
-                <span className={`ml-2 px-2 py-0.5 rounded text-xs ${
-                  alert.riskScore > 80 ? "bg-red-700" : 
-                  alert.riskScore > 60 ? "bg-yellow-700" : "bg-blue-700"
-                }`}>
-                  {alert.riskLevel} Risk
-                </span>
-              </p>
-              <p className="text-sm"><strong>Route:</strong> {alert.lastPort} → {alert.nextPort}</p>
-              <p className="text-sm"><strong>Recommended Action:</strong> {alert.recommendedAction}</p>
-              <p className="text-sm"><strong>Message:</strong> {alert.message}</p>
-            </div>
-          ))}
+      {traffickingLocationStatus === "land" ? (
+        <div className="border-l-4 border-red-600 p-3 rounded bg-[#1A2535]">
+          <h4 className="text-md font-semibold">LOCATION ERROR</h4>
+          <p className="text-sm">
+            <strong>Location:</strong> {parseFloat(traffickingData.lat).toFixed(4)}, {parseFloat(traffickingData.lon).toFixed(4)}
+            <span className="ml-2 text-red-400 font-bold">ON LAND</span>
+          </p>
+          <p className="text-sm"><strong>Message:</strong> Maritime analysis unavailable for land locations</p>
         </div>
+      ) : (
+        traffickingAlerts.length === 0 ? (
+          <p className="text-gray-400">No intelligence alerts at this time.</p>
+        ) : (
+          <div className="space-y-3">
+            {traffickingAlerts.map((alert, index) => (
+              <div key={index} className={`border-l-4 p-3 rounded bg-[#1A2535] ${
+                alert.isLand ? "border-red-600" :
+                alert.riskScore > 80 ? "border-red-600" : 
+                alert.riskScore > 60 ? "border-yellow-600" : "border-blue-600"
+              }`}>
+                <h4 className="text-md font-semibold">
+                  {alert.isLand ? "LOCATION ERROR" :
+                  alert.riskScore > 80 ? "HIGH RISK ALERT" : "Risk Assessment"}
+                </h4>
+                <p className="text-sm"><strong>Vessel ID:</strong> {alert.vesselId}</p>
+                <p className="text-sm"><strong>Time:</strong> {new Date(alert.timestamp).toLocaleString()}</p>
+                <p className="text-sm">
+                  <strong>Location:</strong> {parseFloat(alert.lat).toFixed(4)}, {parseFloat(alert.lon).toFixed(4)}
+                  {alert.isLand && (
+                    <span className="ml-2 text-red-400 font-bold">ON LAND</span>
+                  )}
+                </p>
+                {!alert.isLand && (
+                  <>
+                    <p className="text-sm">
+                      <strong>Risk Score:</strong> {alert.riskScore}/100 
+                      <span className={`ml-2 px-2 py-0.5 rounded text-xs ${
+                        alert.riskScore > 80 ? "bg-red-700" : 
+                        alert.riskScore > 60 ? "bg-yellow-700" : "bg-blue-700"
+                      }`}>
+                        {alert.riskLevel} Risk
+                      </span>
+                    </p>
+                    <p className="text-sm"><strong>Route:</strong> {alert.lastPort} → {alert.nextPort}</p>
+                    <p className="text-sm"><strong>Recommended Action:</strong> {alert.recommendedAction}</p>
+                  </>
+                )}
+                <p className="text-sm"><strong>Message:</strong> {alert.isLand ? "Maritime analysis unavailable for land locations" : alert.message}</p>
+              </div>
+            ))}
+          </div>
+        )
       )}
     </div>
   </div>

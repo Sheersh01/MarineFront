@@ -399,6 +399,11 @@ const Login = ({ onBackToHome }) => {
     navigate('/');
   };
   
+  // Handler for navigating to dashboard
+  const handleNavigateToDashboard = () => {
+    navigate('/dashboard-analysis');
+  };
+  
   // If user is logged in, show welcome page
   if (isLoggedIn) {
     return (
@@ -417,7 +422,7 @@ const Login = ({ onBackToHome }) => {
               </button>
               <button 
                 className="px-5 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors" 
-                onClick={onBackToHome || handleNavigateHome}
+                onClick={onBackToHome || handleNavigateToDashboard}
               >
                 Return to Dashboard
               </button>
@@ -651,13 +656,7 @@ const Login = ({ onBackToHome }) => {
             </button>
             
             <div className="mt-4 text-center">
-              <button 
-                type="button" 
-                onClick={onBackToHome} 
-                className="text-blue-500 hover:text-blue-700 text-sm"
-              >
-                Return to dashboard
-              </button>
+            
             </div>
             
             <button 
