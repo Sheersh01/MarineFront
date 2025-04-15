@@ -433,26 +433,41 @@ class ArcballControl {
     const timeScale = deltaTime / targetFrameDuration + 0.00001;
     let angleFactor = timeScale;
     let snapRotation = quat.create();
-
+  
     if (this.isPointerDown) {
-      const INTENSITY = 0.3 * timeScale;
-      const ANGLE_AMPLIFICATION = 5 / timeScale;
-
+      // Add a base sensitivity that works for all devices
+      const BASE_SENSITIVITY = 0.3;
+      const INTENSITY = BASE_SENSITIVITY * timeScale;
+      
+      // Calculate movement delta
       const midPointerPos = vec2.sub(vec2.create(), this.pointerPos, this.previousPointerPos);
-      vec2.scale(midPointerPos, midPointerPos, INTENSITY);
-
+      
+      // Get movement magnitude to normalize between touchpads and mice
+      const moveMagnitude = vec2.length(midPointerPos);
+      
+      // Use a fixed angle amplification that doesn't depend on timeScale
+      const ANGLE_AMPLIFICATION = 3.0;
+      
+      // Normalize the movement intensity based on magnitude
+      // This helps smooth out differences between touchpads (small, frequent moves)
+      // and mice (larger, less frequent moves)
+      const normalizedIntensity = INTENSITY * Math.min(1.0, moveMagnitude / 10.0);
+      
+      vec2.scale(midPointerPos, midPointerPos, normalizedIntensity);
+  
       if (vec2.sqrLen(midPointerPos) > this.EPSILON) {
         vec2.add(midPointerPos, this.previousPointerPos, midPointerPos);
-
+  
         const p = this.#project(midPointerPos);
         const q = this.#project(this.previousPointerPos);
         const a = vec3.normalize(vec3.create(), p);
         const b = vec3.normalize(vec3.create(), q);
-
+  
         vec2.copy(this.previousPointerPos, midPointerPos);
-
+  
+        // Apply a consistent amplification factor
         angleFactor *= ANGLE_AMPLIFICATION;
-
+  
         this.quatFromVectors(a, b, this.pointerRotation, angleFactor);
       } else {
         quat.slerp(this.pointerRotation, this.pointerRotation, this.IDENTITY_QUAT, INTENSITY);
@@ -460,7 +475,7 @@ class ArcballControl {
     } else {
       const INTENSITY = 0.1 * timeScale;
       quat.slerp(this.pointerRotation, this.pointerRotation, this.IDENTITY_QUAT, INTENSITY);
-
+  
       if (this.snapTargetDirection) {
         const SNAPPING_INTENSITY = 0.2;
         const a = this.snapTargetDirection;
@@ -471,15 +486,15 @@ class ArcballControl {
         this.quatFromVectors(a, b, snapRotation, angleFactor);
       }
     }
-
+  
     const combinedQuat = quat.multiply(quat.create(), snapRotation, this.pointerRotation);
     this.orientation = quat.multiply(quat.create(), combinedQuat, this.orientation);
     quat.normalize(this.orientation, this.orientation);
-
+  
     const RA_INTENSITY = 0.8 * timeScale;
     quat.slerp(this._combinedQuat, this._combinedQuat, combinedQuat, RA_INTENSITY);
     quat.normalize(this._combinedQuat, this._combinedQuat);
-
+  
     const rad = Math.acos(this._combinedQuat[3]) * 2.0;
     const s = Math.sin(rad / 2.0);
     let rv = 0;
@@ -489,11 +504,11 @@ class ArcballControl {
       this.rotationAxis[1] = this._combinedQuat[1] / s;
       this.rotationAxis[2] = this._combinedQuat[2] / s;
     }
-
+  
     const RV_INTENSITY = 0.5 * timeScale;
     this._rotationVelocity += (rv - this._rotationVelocity) * RV_INTENSITY;
     this.rotationVelocity = this._rotationVelocity / timeScale;
-
+  
     this.updateCallback(deltaTime);
   }
 
