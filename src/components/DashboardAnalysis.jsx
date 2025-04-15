@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { isWater } from "../utils/geocode.js"; 
+
 // Fix for Leaflet marker icon issue in React
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -10,6 +11,7 @@ L.Icon.Default.mergeOptions({
   iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png"
 });
+
 // This component will handle updating the map center
 const MapCenterHandler = ({ lat, lng }) => {
   const map = useMap();
@@ -35,6 +37,13 @@ const DashboardAnalysis = ({ onBackToHome = () => console.warn("onBackToHome not
   const [apiError, setApiError] = useState(null);
   const fileInputRef = useRef(null);
   const mapRef = useRef(null);
+  const alertSoundRef = useRef(null);
+  
+  // State for showing result container
+  const [showResult, setShowResult] = useState(false);
+  // State for oil spill detection history
+  const [analysisHistory, setAnalysisHistory] = useState([]);
+  
   // State for vessel data form
   const [vesselData, setVesselData] = useState({
     mmsi: "123456789",
@@ -49,82 +58,21 @@ const DashboardAnalysis = ({ onBackToHome = () => console.warn("onBackToHome not
   });
   const [vessels, setVessels] = useState([]);
 
-// State for trafficking data form
-const [traffickingData, setTraffickingData] = useState({
-  vesselId: "VES-2023-42",
-  timestamp: "",
-  riskScore: "78",
-  lastPort: "Shanghai",
-  nextPort: "Singapore",
-  lat: "3.167",
-  lon: "105.845",
-  cargoType: "Container",
-  flagState: "Panama"
-});
-const [traffickingAlerts, setTraffickingAlerts] = useState([]);
-const [traffickingResponse, setTraffickingResponse] = useState("No trafficking data submitted yet.");
-const handleTraffickingInputChange = (e) => {
-  const { id, value } = e.target;
-  setTraffickingData(prevData => ({
-    ...prevData,
-    [id]: value
-  }));
-};
-useEffect(() => {
-  const now = new Date();
-  const tzoffset = now.getTimezoneOffset() * 60000;
-  const localISOTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0, 16);
-  setVesselData(prevData => ({
-    ...prevData,
-    timestamp: localISOTime
-  }));
-  // Add this line for traffickingData
-  setTraffickingData(prevData => ({
-    ...prevData,
-    timestamp: localISOTime
-  }));
-}, []);
-const handleTraffickingSubmit = async (e) => {
-  e.preventDefault();
-  setTraffickingResponse("Processing vessel intelligence data...");
+  // State for trafficking data form
+  const [traffickingData, setTraffickingData] = useState({
+    vesselId: "VES-2023-42",
+    timestamp: "",
+    riskScore: "78",
+    lastPort: "Shanghai",
+    nextPort: "Singapore",
+    lat: "3.167",
+    lon: "105.845",
+    cargoType: "Container",
+    flagState: "Panama"
+  });
+  const [traffickingAlerts, setTraffickingAlerts] = useState([]);
+  const [traffickingResponse, setTraffickingResponse] = useState("No trafficking data submitted yet.");
   
-  // Simulate trafficking analysis
-  setTimeout(() => {
-    const riskScore = parseInt(traffickingData.riskScore);
-    const randomFactor = Math.floor(Math.random() * 20) - 10; // -10 to +10
-    const calcRiskScore = Math.min(Math.max(riskScore + randomFactor, 0), 100);
-    
-    const response = {
-      vesselId: traffickingData.vesselId,
-      timestamp: new Date(traffickingData.timestamp).toISOString(),
-      riskScore: calcRiskScore,
-      riskLevel: calcRiskScore > 75 ? "High" : calcRiskScore > 50 ? "Medium" : "Low",
-      lat: parseFloat(traffickingData.lat),
-      lon: parseFloat(traffickingData.lon),
-      suspiciousActivity: calcRiskScore > 70,
-      recommendedAction: calcRiskScore > 80 ? "Immediate Inspection" : 
-                          calcRiskScore > 60 ? "Monitor Closely" : "Routine Surveillance",
-      intelligenceNotes: "Vessel analyzed based on historical patterns and current intelligence."
-    };
-    
-    setTraffickingResponse(JSON.stringify(response, null, 2));
-    
-    // Create alert if risk score is high
-    if (calcRiskScore > 65) {
-      const alert = {
-        ...response,
-        alertTime: new Date().toISOString(),
-        message: `HIGH RISK VESSEL: ${response.vesselId} has a risk score of ${calcRiskScore}%`
-      };
-      setTraffickingAlerts(prev => [alert, ...prev].slice(0, 5));
-    }
-  }, 1500);
-};
-
-const clearTraffickingAlerts = () => {
-  setTraffickingAlerts([]);
-};
-
   // State for current alert
   const [currentAlert, setCurrentAlert] = useState(null);
   const [lastUpdated, setLastUpdated] = useState("Never");
@@ -167,6 +115,15 @@ const clearTraffickingAlerts = () => {
     },
   };
 
+  // Handle trafficking form input changes
+  const handleTraffickingInputChange = (e) => {
+    const { id, value } = e.target;
+    setTraffickingData(prevData => ({
+      ...prevData,
+      [id]: value
+    }));
+  };
+  
   // Set default timestamp to current time on component mount
   useEffect(() => {
     const now = new Date();
@@ -176,7 +133,31 @@ const clearTraffickingAlerts = () => {
       ...prevData,
       timestamp: localISOTime
     }));
+    // Add this line for traffickingData
+    setTraffickingData(prevData => ({
+      ...prevData,
+      timestamp: localISOTime
+    }));
+    
+    // Fetch analysis history on component mount
+    fetchAnalysisHistory();
   }, []);
+
+  // Fetch analysis history
+  const fetchAnalysisHistory = async () => {
+    try {
+      const response = await fetch(`${API_URL}/images/`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      if (data.images && data.images.length > 0) {
+        setAnalysisHistory(data.images);
+      }
+    } catch (error) {
+      console.error('Error fetching history:', error);
+    }
+  };
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -185,32 +166,60 @@ const clearTraffickingAlerts = () => {
       return;
     }
 
-    setUploading(true);
-    setApiResult(null);
-    setApiError(null);
-
     const reader = new FileReader();
     reader.onload = () => {
       setUploadedImage(reader.result);
     };
     reader.readAsDataURL(file);
+  };
 
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!uploadedImage) {
+      alert("Please select an image file");
+      return;
+    }
+    
+    setUploading(true);
+    setApiResult(null);
+    setApiError(null);
+    setShowResult(false);
+    
+    // Get the file from the file input
+    const file = fileInputRef.current.files[0];
+    
     const formData = new FormData();
-    formData.append("image", file);
-
+    formData.append('file', file);
+    
     try {
-      const response = await fetch(`${API_URL}/predict`, {
+      const response = await fetch(`${API_URL}/upload/`, {
         method: "POST",
         body: formData,
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
         throw new Error("Network response was not ok");
       }
 
       const result = await response.json();
       setApiResult(result);
+      setShowResult(true);
+      
+      // Play alert sound for oil spill
+      if (result.type === 'oil_spill' && result.needs_alert && alertSoundRef.current) {
+        try {
+          alertSoundRef.current.currentTime = 0;
+          alertSoundRef.current.play().catch(err => {
+            console.error('Failed to play alert sound:', err);
+          });
+        } catch (err) {
+          console.error('Error with audio playback:', err);
+        }
+      }
+      
+      // Refresh history after successful upload
+      fetchAnalysisHistory();
     } catch (error) {
       console.error("Upload failed:", error);
       setApiError(error.message);
@@ -221,12 +230,6 @@ const clearTraffickingAlerts = () => {
 
   const triggerFileInput = () => {
     fileInputRef.current.click();
-  };
-
-  // Added console log to debug the onBackToHome function
-  const handleBackClick = () => {
-    console.log("Back to Home clicked");
-    onBackToHome();
   };
   
   // Handle form input changes
@@ -240,6 +243,47 @@ const clearTraffickingAlerts = () => {
     if (id === 'lat' || id === 'lon') {
       setLocationStatus(null);
     }
+  };
+  
+  const handleTraffickingSubmit = async (e) => {
+    e.preventDefault();
+    setTraffickingResponse("Processing vessel intelligence data...");
+    
+    // Simulate trafficking analysis
+    setTimeout(() => {
+      const riskScore = parseInt(traffickingData.riskScore);
+      const randomFactor = Math.floor(Math.random() * 20) - 10; // -10 to +10
+      const calcRiskScore = Math.min(Math.max(riskScore + randomFactor, 0), 100);
+      
+      const response = {
+        vesselId: traffickingData.vesselId,
+        timestamp: new Date(traffickingData.timestamp).toISOString(),
+        riskScore: calcRiskScore,
+        riskLevel: calcRiskScore > 75 ? "High" : calcRiskScore > 50 ? "Medium" : "Low",
+        lat: parseFloat(traffickingData.lat),
+        lon: parseFloat(traffickingData.lon),
+        suspiciousActivity: calcRiskScore > 70,
+        recommendedAction: calcRiskScore > 80 ? "Immediate Inspection" : 
+                          calcRiskScore > 60 ? "Monitor Closely" : "Routine Surveillance",
+        intelligenceNotes: "Vessel analyzed based on historical patterns and current intelligence."
+      };
+      
+      setTraffickingResponse(JSON.stringify(response, null, 2));
+      
+      // Create alert if risk score is high
+      if (calcRiskScore > 65) {
+        const alert = {
+          ...response,
+          alertTime: new Date().toISOString(),
+          message: `HIGH RISK VESSEL: ${response.vesselId} has a risk score of ${calcRiskScore}%`
+        };
+        setTraffickingAlerts(prev => [alert, ...prev].slice(0, 5));
+      }
+    }, 1500);
+  };
+
+  const clearTraffickingAlerts = () => {
+    setTraffickingAlerts([]);
   };
   
   const handleVesselSubmit = async (e) => {
@@ -317,7 +361,6 @@ const clearTraffickingAlerts = () => {
       setCheckingLand(false);
     }
   };
-
   
   // Update map
   const updateMap = async () => {
@@ -339,8 +382,7 @@ const clearTraffickingAlerts = () => {
       console.error('Map update error:', error);
     }
   };
- 
-
+  
   // Simulate response
   const handleSimulate = () => {
     // First check if the location is on land
@@ -443,12 +485,17 @@ const clearTraffickingAlerts = () => {
     }
   };
 
+  // Function to format date
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleString();
+  };
+
   return (
     <div className="p-8 bg-[#121A27] text-white h-screen overflow-auto">
       <div className="bg-[#1A2535] p-6 rounded-lg shadow-lg">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Maritime Intelligence Dashboard</h2>
-        
         </div>
 
         {/* Tabs */}
@@ -478,74 +525,154 @@ const clearTraffickingAlerts = () => {
           </p>
         </div>
 
-        {/* Upload section only for oil-spill */}
-        {activeTab === "oil-spill" && (
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium">Oil Spill Documentation</h3>
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleImageUpload}
-                accept="image/*"
-                className="hidden"
-              />
-              <button
-                onClick={triggerFileInput}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-white"
-                disabled={uploading}
-              >
-                {uploading ? "Uploading..." : "Upload Photo"}
-              </button>
+        {/* Metrics display */}
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          {dashboardData[activeTab].metrics.map((metric, index) => (
+            <div key={index} className="bg-[#2a3545] p-4 rounded">
+              <p className="text-gray-400 text-sm">{metric.label}</p>
+              <div className="flex items-baseline">
+                <span className="text-xl font-bold">{metric.value}</span>
+                <span className={`ml-2 text-sm ${metric.change.includes('-') ? 'text-red-400' : 'text-green-400'}`}>
+                  {metric.change}
+                </span>
+              </div>
             </div>
+          ))}
+        </div>
 
-            {/* Image Preview & Result */}
+        {/* Oil Spill section */}
+        {activeTab === "oil-spill" && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Upload Section */}
             <div className="bg-[#2a3545] p-4 rounded">
-              {uploadedImage ? (
-                <div>
-                  <p className="text-gray-300 mb-2">Uploaded Image:</p>
-                  <img
-                    src={uploadedImage}
-                    alt="Uploaded"
-                    className="max-w-full max-h-96 rounded mb-4"
+              <h3 className="text-lg font-medium mb-4">Oil Spill Documentation</h3>
+              
+              <form onSubmit={handleFormSubmit} className="flex flex-col items-center">
+                <div className="w-full mb-4">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleImageUpload}
+                    accept="image/*"
+                    className="hidden"
                   />
-                  {uploading && (
-                    <p className="text-yellow-400">Processing image...</p>
+                  <button
+                    type="button"
+                    onClick={triggerFileInput}
+                    className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white"
+                  >
+                    Select Image
+                  </button>
+                </div>
+                
+                {uploadedImage && (
+                  <div className="w-full mb-4">
+                    <p className="text-gray-300 mb-2">Preview:</p>
+                    <img
+                      src={uploadedImage}
+                      alt="Preview"
+                      className="max-w-full max-h-60 rounded mb-4 mx-auto"
+                    />
+                  </div>
+                )}
+                
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-white"
+                  disabled={uploading || !uploadedImage}
+                >
+                  {uploading ? "Analyzing..." : "Analyze Image"}
+                </button>
+                
+                {uploading && (
+                  <div className="flex flex-col items-center mt-4">
+                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                    <p className="mt-2">Analyzing image...</p>
+                  </div>
+                )}
+              </form>
+              
+              {/* Audio element for alert sound */}
+              <audio ref={alertSoundRef} preload="auto">
+                <source src={`${API_URL}/sound/horn`} type="audio/mpeg" />
+                Your browser does not support the audio element.
+              </audio>
+              
+              {/* Analysis Result */}
+              {showResult && apiResult && (
+                <div className="mt-6 border-t border-gray-700 pt-4">
+                  <h4 className="text-center font-semibold mb-3">Analysis Result</h4>
+                  
+                  {apiResult.path && (
+                    <img 
+                      src={apiResult.path} 
+                      alt="Analyzed Image" 
+                      className="max-w-full max-h-60 rounded mb-4 mx-auto"
+                    />
                   )}
-                  {apiResult && (
-                    <div className="text-sm text-gray-300 mt-2">
-                      <p><strong>Prediction:</strong> {apiResult.prediction}</p>
-                      {apiResult.confidence && (
-                        <p><strong>Confidence:</strong> {apiResult.confidence}</p>
-                      )}
-                      {apiResult.alert && (
-                        <p className="text-red-400 mt-2">
-                          🚨 <strong>Alert:</strong> {apiResult.alert}
-                        </p>
-                      )}
+                  
+                  {apiResult.type === "clean_water" ? (
+                    <div className="bg-green-800 bg-opacity-40 p-4 rounded">
+                      <h5 className="font-semibold">Clean Water Detected</h5>
+                      <p>The image shows clean water with no signs of oil spill.</p>
+                    </div>
+                  ) : (
+                    <div className="bg-red-800 bg-opacity-40 p-4 rounded animate-pulse">
+                      <h5 className="font-semibold">⚠️ OIL SPILL DETECTED ⚠️</h5>
+                      <p>The image shows signs of an oil spill. Immediate action is recommended!</p>
                     </div>
                   )}
-                  {apiError && (
-                    <div className="text-red-400 mt-2">
-                      ❌ Error: {apiError}
+                </div>
+              )}
+              
+              {apiError && (
+                <div className="mt-4 text-red-400">
+                  ❌ Error: {apiError}
+                </div>
+              )}
+            </div>
+            
+            {/* Analysis History */}
+            <div className="bg-[#2a3545] p-4 rounded">
+              <h3 className="text-lg font-medium mb-4">Analysis History</h3>
+              
+              {analysisHistory.length > 0 ? (
+                <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
+                  {analysisHistory.map((image, index) => (
+                    <div 
+                      key={index} 
+                      className={`p-3 rounded ${
+                        image.type === "clean_water" ? "bg-green-900 bg-opacity-30" : "bg-red-900 bg-opacity-30"
+                      }`}
+                    >
+                      <div className="flex flex-col md:flex-row">
+                        <div className="md:w-1/2 mb-2 md:mb-0">
+                          <img 
+                            src={image.path} 
+                            alt={image.filename} 
+                            className="max-h-32 rounded mx-auto"
+                          />
+                        </div>
+                        <div className="md:w-1/2 md:pl-3">
+                          <h5 className="font-semibold">
+                            {image.type === "clean_water" ? "Clean Water" : "⚠️ OIL SPILL"}
+                          </h5>
+                          <p className="text-sm text-gray-400">
+                            Analyzed on: {formatDate(image.upload_time)}
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                  )}
+                  ))}
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed border-gray-600 rounded text-center">
-                  <p className="text-gray-400 mb-2">No image uploaded yet</p>
-                  <p className="text-gray-500 text-sm max-w-md">
-                    Upload photos of oil spill incidents. Our system can analyze
-                    the extent, type of oil, and suggest actions.
-                  </p>
-                </div>
+                <p className="text-center text-gray-400">No analysis history yet.</p>
               )}
             </div>
           </div>
         )}
-
-        {/* Illegal Fishing Detection Section */}
-        {activeTab === "illegal-fishing" && (
+       {/* Illegal Fishing Detection Section */}
+       {activeTab === "illegal-fishing" && (
           <div className="mb-6">
             <div className="flex flex-col lg:flex-row gap-6">
               {/* Vessel Data Input Panel */}
@@ -1032,6 +1159,7 @@ const clearTraffickingAlerts = () => {
     </div>
   </div>
 )}
+
       </div>
     </div>
   );
