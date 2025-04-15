@@ -77,21 +77,6 @@ const HeroSection = () => {
     };
   }, []);
 
-  // Control body scrolling based on animation state
-  useEffect(() => {
-    // Disable scrolling when component mounts, enable when animation completes or components show
-    document.body.style.overflow = showDashboard ? "auto" : "hidden";
-
-    if (animationComplete) {
-      document.body.style.overflow = "auto";
-    }
-
-    // Cleanup function to ensure scrolling is restored when component unmounts
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [animationComplete, showDashboard]);
-
   // Handle GSAP animations
   useEffect(() => {
     if (typeof window !== 'undefined' && window.innerWidth >= 1024 && !showDashboard) {
@@ -264,7 +249,7 @@ const HeroSection = () => {
     return (
       <div className="h-full w-full bg-[#121A27] text-white">
         <nav className="flex items-center w-full z-50 bg-[#121A27]">
-          <div className="border-b-2 border-r-2 border-white w-[50%] md:py-6 py-4 pl-6 lg:text-[1vw] md:text-[1.2vw] text-[1.2vw]">
+          <div  className="border-b-2 border-r-2 border-white md:w-[50%] w-[40%] md:py-6 py-2 pl-6 lg:text-[1vw] md:text-[1.2vw] text-[3vw]">
             <h1>DeepLens</h1>
           </div>
           <div 
@@ -273,10 +258,10 @@ const HeroSection = () => {
           >
             <h1>{isLoggedIn ? `Hello, ${userName}` : "Login to Portal"}</h1>
           </div>
-          <div className="nav-item border-b-2 border-r-2 border-white w-[20%] md:py-6 py-4 text-center lg:text-[1vw] md:text-[1.2vw] text-[1.2vw] bg-white text-[#121A27]">
+        3<div className="border-b-2 border-r-2 border-white md:w-[20%] w-[30%] md:py-6 py-[6px] text-center lg:text-[1vw] md:text-[1.2vw] text-[2vw] nav-item">
             <h1>Dashboard Analytics</h1>
           </div>
-          <div onClick={() => setMenuOpen((prev) => !prev)} className="nav-item cursor-pointer border-b-2 border-white w-[10%] md:py-6 py-4 text-center lg:text-[1vw] md:text-[1.2vw] text-[1.2vw]">
+          <div onClick={() => setMenuOpen((prev) => !prev)} className="nav-item cursor-pointer border-b-2 border-white w-[10%] md:py-6 py-3 text-center lg:text-[1vw] md:text-[1.2vw] text-[2vw]">
             <h1>Menu</h1>
           </div>
         </nav>
@@ -290,7 +275,7 @@ const HeroSection = () => {
             <InfiniteMenu items={items} />
             <button
               onClick={() => setMenuOpen(false)}
-              className="absolute top-5 right-5 text-white text-2xl z-[1000]"
+              className="absolute top-5 right-16 text-white text-2xl z-[1000]"
             >
               ✕
             </button>
@@ -308,28 +293,28 @@ const HeroSection = () => {
         <nav className="flex items-center w-full z-50 bg-[#121A27]">
           <div
             ref={(el) => (navbarItemsRef.current[0] = el)}
-            className="border-b-2 border-r-2 border-white w-[50%] md:py-6 py-4 pl-6 lg:text-[1vw] md:text-[1.2vw] text-[1.2vw]"
+            className="border-b-2 border-r-2 border-white md:w-[50%] w-[40%] md:py-6 py-2 pl-6 lg:text-[1vw] md:text-[1.2vw] text-[3vw]"
           >
             <h1>DeepLens</h1>
           </div>
           <div
             ref={(el) => (navbarItemsRef.current[1] = el)}
             onClick={handleLoginClick} 
-            className="nav-item border-b-2 border-r-2 border-white w-[20%] md:py-6 py-4 text-center lg:text-[1vw] md:text-[1.2vw] text-[1.2vw] cursor-pointer"
+            className="nav-item border-b-2 border-r-2 border-white w-[20%] md:py-6 py-3 text-center lg:text-[1vw] md:text-[1.2vw] text-[1.7vw] cursor-pointer"
           >
             <h1>{isLoggedIn ? `Hello, ${userName}` : "Login to Portal"}</h1>
           </div>
           <div
             ref={(el) => (navbarItemsRef.current[2] = el)}
             onClick={handleDashboardClick} 
-            className={`${isLoggedIn ? 'nav-item' : 'nav-item disabled-nav-item'} border-b-2 border-r-2 border-white w-[20%] md:py-6 py-4 text-center lg:text-[1vw] md:text-[1.2vw] text-[1.2vw]`}
+            className={`${isLoggedIn ? 'nav-item' : 'nav-item disabled-nav-item'} border-b-2 border-r-2 border-white md:w-[20%] w-[30%] md:py-6 py-[6px] text-center lg:text-[1vw] md:text-[1.2vw] text-[2vw]`}
           >
             <h1>Dashboard Analytics</h1>
           </div>
           <div
             onClick={() => setMenuOpen((prev) => !prev)}
             ref={(el) => (navbarItemsRef.current[3] = el)}
-            className="nav-item cursor-pointer border-b-2 border-white w-[10%] md:py-6 py-4 text-center lg:text-[1vw] md:text-[1.2vw] text-[1.2vw]"
+            className="nav-item cursor-pointer border-b-2 border-white w-[10%] md:py-6 py-3 text-center lg:text-[1vw] md:text-[1.2vw] text-[2vw]"
           >
             Menu
           </div>
@@ -381,7 +366,7 @@ const HeroSection = () => {
             <InfiniteMenu items={items} />
             <button
               onClick={() => setMenuOpen(false)}
-              className="absolute top-5 right-5 text-white text-2xl z-[1000]"
+              className="absolute top-5 right-16 text-white text-2xl z-[1000]"
             >
               ✕
             </button>

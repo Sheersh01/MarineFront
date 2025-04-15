@@ -525,21 +525,7 @@ const DashboardAnalysis = ({ onBackToHome = () => console.warn("onBackToHome not
           </p>
         </div>
 
-        {/* Metrics display */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          {dashboardData[activeTab].metrics.map((metric, index) => (
-            <div key={index} className="bg-[#2a3545] p-4 rounded">
-              <p className="text-gray-400 text-sm">{metric.label}</p>
-              <div className="flex items-baseline">
-                <span className="text-xl font-bold">{metric.value}</span>
-                <span className={`ml-2 text-sm ${metric.change.includes('-') ? 'text-red-400' : 'text-green-400'}`}>
-                  {metric.change}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-
+   
         {/* Oil Spill section */}
         {activeTab === "oil-spill" && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

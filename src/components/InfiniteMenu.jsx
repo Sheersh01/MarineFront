@@ -1004,11 +1004,11 @@ export default function InfiniteMenu({ items = [] }) {
         ${
           isMoving
             ? 'bottom-[-80px] opacity-0 pointer-events-none duration-100 scale-0 -translate-x-1/2'
-            : 'bottom-12 sm:bottom-16 md:bottom-20 lg:bottom-24 opacity-100 pointer-events-auto duration-500 scale-100 -translate-x-1/2'
+            : 'bottom-30 md:bottom-20 lg:bottom-24 opacity-100 pointer-events-auto duration-500 scale-100 -translate-x-1/2'
         }
       `}
     >
-      <p className="select-none relative text-[#060606] top-[2px] text-base sm:text-lg md:text-xl lg:text-2xl">
+      <p className="select-none relative text-[#060606] top-[2px] text-base sm:text-lg md:text-xl lg:text-2xl ">
         &#x2197;
       </p>
     </div>

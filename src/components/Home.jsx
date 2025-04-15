@@ -8,16 +8,37 @@ import Footer from "./Footer";
 
 const Home = () => {
   const [showPage3, setShowPage3] = useState(false);
+  const [deviceType, setDeviceType] = useState("desktop");
   
   useEffect(() => {
-    // Set a timer to show Page3 after 2 seconds (adjust as needed)
+    // Check device type based on screen width
+    const checkDeviceType = () => {
+      if (window.innerWidth <= 767) {
+        setDeviceType("mobile");
+      } else if (window.innerWidth <= 1024) {
+        setDeviceType("tablet");
+      } else {
+        setDeviceType("desktop");
+      }
+    };
+    
+    // Initial check
+    checkDeviceType();
+    
+    // Add event listener for window resize
+    window.addEventListener('resize', checkDeviceType);
+    
+    // Set timer based on device type
     const timer = setTimeout(() => {
       setShowPage3(true);
-    }, 5000);
+    }, deviceType === "mobile" ? 1000 : 5000);
     
-    // Clean up the timer when component unmounts
-    return () => clearTimeout(timer);
-  }, []);
+    // Clean up the timer and event listener when component unmounts
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', checkDeviceType);
+    };
+  }, [deviceType]);
 
   return (
     <div className="bg-[#121A27] min-h-screen text-white">

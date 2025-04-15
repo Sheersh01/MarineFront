@@ -49,7 +49,7 @@ const Page2 = () => {
     <div className="h-full bg-[#121A27]">
       <div
         ref={paragraphRef}
-        className="text-center w-full pt-30 pb-10 font-[hel]"
+        className="text-center w-full md:pt-30 pt-10 pb-10 font-[hel]"
       >
         <p className=" md:w-[80%] w-[90%] mx-auto lg:text-[2vw] md:text-[2vw] text-[2.6vw] leading-snug pb-20">
         We are a fast-growing ocean intelligence agency based in India, founded in 2014, focused on setting new standards in digital marine monitoring and data-driven protection. Our work spans across oceans and coasts, using publicly available data and AI to detect, predict, and act on threats to marine ecosystems.  
